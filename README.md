@@ -7,9 +7,6 @@ Work with Supercell\`s files on **any** os! SC and CSV are supported for all Sup
 ### Features:
 - SC compile / decompile;
 - Compression and decompression.
-- 
-### In the plans:
-- CSV updating.
 
 ### How to install and use
 - On Windows:
@@ -34,6 +31,9 @@ Work with Supercell\`s files on **any** os! SC and CSV are supported for all Sup
   - Download XCoder from the [releases page](https://github.com/Vorono4ka/XCoder/releases) and extract it;
   - Install loguru using pip;
   - In PyDroid open and execute "main.py" file.
+
+### In the plans:
+- CSV updating.
 
 ## Credits
 This tool is based on Original [XCoder](https://github.com/MasterDevX/xcoder), Developer: [MasterDevX](https://github.com/MasterDevX)</br>
