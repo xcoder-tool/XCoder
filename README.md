@@ -1,41 +1,46 @@
-# XCoder - easy to use modding tool
-Multiplatform modding tool for ANY Supercell\`s game.
+# XCoder: The Easy Modding Tool
+
+A multiplatform modding tool designed for ANY Supercell game.
 
 ## About
-Work with Supercell\`s files on **any** os! SC and CSV are supported for all Supercell\`s games.
 
-### Features:
-- SC compile / decompile;
-- Compression and decompression.
+Effortlessly work with Supercell's game files on **any** operating system! XCoder offers support for SC and CSV formats across all Supercell games.
 
-### How to install and use
-- On Windows:
-  - Download Python 3.7 or newer version from [official page](https://www.python.org/downloads/);
-  - Install Python. While Installing, enable such parameters as "Add Python to PATH", "Install pip", "Install py launcher", "Associate files with Python" and "Add Python to environment variables";
-  - Download XCoder from the [releases page](https://github.com/Vorono4ka/XCoder/releases) and extract it;
-  - Locate the extracted directory and install required modules: 
-    ```pip install -r requirements.txt```;
-  - Execute "main.py" file.
+### Features
 
-- On Linux:
-  - Open Terminal and install Python by executing following command: 
-    ```sudo apt-get update && sudo apt-get install python3 python3-pip```;
-  - Download XCoder from the [releases page](https://github.com/Vorono4ka/XCoder/releases) and extract it;
-  - Locate the extracted directory and install required modules by executing following command:
-    ```sudo pip3 install -r requirements.txt```;
-  - Execute "main.py" file.
+- SC compile / decompile
+- Compression and decompression
 
-- On Android:
-  - Download and install PyDroid app from [Google Play](https://play.google.com/store/apps/details?id=ru.iiec.pydroid3);
-  - Open PyDroid and wait until Python installs;
-  - Download XCoder from the [releases page](https://github.com/Vorono4ka/XCoder/releases) and extract it;
-  - Install loguru using pip;
-  - In PyDroid open and execute "main.py" file.
+### Installation and Usage
 
-### In the plans:
-- CSV updating.
+**Windows:**
+
+1. Download Python 3.7 or a newer version from the [official page](https://www.python.org/downloads/).
+2. During installation, select options like "Add Python to PATH," "Install pip," "Install py launcher," "Associate files with Python," and "Add Python to environment variables."
+3. Download XCoder from the [releases page](https://github.com/Vorono4ka/XCoder/releases) and extract the files.
+4. Go to the extracted directory and install required modules by executing: `pip install -r requirements.txt`
+5. Run the "main.py" file.
+
+**Linux:**
+
+1. Open Terminal and install Python using: `sudo apt-get update && sudo apt-get install python3 python3-pip`
+2. Download XCoder from the [releases page](https://github.com/xcoder-tool/XCoder/releases) and extract the files.
+3. Navigate to the extracted directory and install necessary modules by executing: `sudo pip3 install -r requirements.txt`
+4. Run the "main.py" file.
+
+**Android:**
+
+1. Download and install the PyDroid app from [Google Play](https://play.google.com/store/apps/details?id=ru.iiec.pydroid3).
+2. Open PyDroid and wait for Python installation.
+3. Get XCoder from the [releases page](https://github.com/Vorono4ka/XCoder/releases) and extract the files.
+4. Install loguru using pip.
+5. In PyDroid, open and execute the "main.py" file.
+
+### Upcoming Features
+
+- CSV updating
 
 ## Credits
-This tool is based on Original [XCoder](https://github.com/MasterDevX/xcoder), Developer: [MasterDevX](https://github.com/MasterDevX)</br>
 
-Many thanks to [spiky_Spike](https://github.com/spiky-s) for the provided developments
+XCoder is based on the original [XCoder](https://github.com/MasterDevX/xcoder), developed by [MasterDevX](https://github.com/MasterDevX).</br>
+Special thanks to [spiky_Spike](https://github.com/spiky-s) for their contributions.
