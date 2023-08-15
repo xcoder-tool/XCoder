@@ -31,8 +31,8 @@
     "csv_label": "CSV",
     "decompress_csv": "Розпакувати CSV",
     "compress_csv": "Запакуати CSV",
-    "decompress_csv_description": "Розпакувати файл таблиці",
-    "compress_csv_description": "Запакувати файл таблиці",
+    "decompress_csv_description": "Розпакувати CSV",
+    "compress_csv_description": "Запакувати CSV",
 
     "other_features_label": "ІНШЕ",
     "check_update": "Шукати оновлення",
@@ -61,7 +61,7 @@
     "xcod_not_found": "Файл '%s.xcod' не існує!",
     "illegal_size": "Неможливий розмір картинки! Очікували %sx%s але отримали %sx%s",
     "resize_qu": "Ти хочеш змінити розмір картинки?",
-    "resizing": "змінюємо розмір...",
+    "resizing": "Змінюємо розмір...",
     "split_pic": "Розділюємо зоображення...",
     "writing_pic": "Записуємо пікселі...",
     "header_done": "Написали Header!",
@@ -86,5 +86,5 @@
     "enabled": "Включено",
     "disabled": "Виключено",
 
-    "install_to_unlock": "Встанови '%s' щоб розблокувати більше функції!"
+    "install_to_unlock": "Встанови '%s' щоб розблокувати більше функцій!"
 }
