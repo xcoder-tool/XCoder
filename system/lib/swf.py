@@ -14,7 +14,7 @@ DEFAULT_LOWRES_SUFFIX = "_lowres"
 
 
 class SupercellSWF:
-    TEXTURES_TAGS = (1, 16, 28, 29, 34, 19, 24, 27)
+    TEXTURES_TAGS = (1, 16, 28, 29, 34, 19, 24, 27, 45)
     SHAPES_TAGS = (2, 18)
     MOVIE_CLIPS_TAGS = (3, 10, 12, 14, 35)
 
