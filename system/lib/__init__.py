@@ -124,7 +124,29 @@ def refill_menu():
             )
             menu.add_category(sc_category)
 
-        csv_category = Menu.Category(1, locale.csv_label)
+            from system.lib.features.ktx import (
+                convert_ktx_textures_to_png,
+                convert_png_textures_to_ktx,
+            )
+
+            ktx_category = Menu.Category(1, "KTX")
+            ktx_category.add(
+                Menu.Item(
+                    name="png2ktx",
+                    description="Converts png to ktx",
+                    handler=convert_png_textures_to_ktx,
+                )
+            )
+            ktx_category.add(
+                Menu.Item(
+                    name="ktx2png",
+                    description="Converts ktx to png",
+                    handler=convert_ktx_textures_to_png,
+                )
+            )
+            menu.add_category(ktx_category)
+
+        csv_category = Menu.Category(2, locale.csv_label)
         csv_category.add(
             Menu.Item(
                 name=locale.decompress_csv,
