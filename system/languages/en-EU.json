@@ -34,6 +34,12 @@
     "decompress_csv_description": "Decompresses spreadsheet file",
     "compress_csv_description": "Compresses spreadsheet file",
 
+    "ktx_label": "KTX",
+    "ktx_from_png_label": "PNG2KTX",
+    "png_from_ktx_label": "KTX2PNG",
+    "ktx_from_png_description": "Converts PNG to KTX",
+    "png_from_ktx_description": "Converts KTX to PNG",
+
     "other_features_label": "OTHER",
     "check_update": "Check for updates",
     "check_for_outdated": "Check for outdated packages",

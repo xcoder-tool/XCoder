@@ -34,6 +34,12 @@
     "decompress_csv_description": "Разжимает файл таблиц",
     "compress_csv_description": "Сжимает файл таблиц",
 
+    "ktx_label": "KTX",
+    "ktx_from_png_label": "PNG2KTX",
+    "png_from_ktx_label": "KTX2PNG",
+    "ktx_from_png_description": "Конвертирует PNG в KTX",
+    "png_from_ktx_description": "Конвертирует KTX в PNG",
+
     "other_features_label": "ПРОЧЕЕ",
     "check_update": "Проверить обновления",
     "check_for_outdated": "Проверка устаревших модулей",

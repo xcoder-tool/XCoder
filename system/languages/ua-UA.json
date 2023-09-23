@@ -34,6 +34,12 @@
     "decompress_csv_description": "Розпакувати файл таблиці",
     "compress_csv_description": "Запакувати файл таблиці",
 
+    "ktx_label": "KTX",
+    "ktx_from_png_label": "PNG2KTX",
+    "png_from_ktx_label": "KTX2PNG",
+    "ktx_from_png_description": "Конвертує PNG у KTX",
+    "png_from_ktx_description": "Конвертує KTX у PNG",
+
     "other_features_label": "ІНШЕ",
     "check_update": "Шукати оновлення",
     "check_for_outdated": "Шукати застарілі пакети",

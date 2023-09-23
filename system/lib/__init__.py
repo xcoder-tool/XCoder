@@ -60,6 +60,16 @@ def check_files_updated():
 def refill_menu():
     menu.categories.clear()
 
+    sc_category = Menu.Category(0, locale.sc_label)
+    ktx_category = Menu.Category(1, locale.ktx_label)
+    csv_category = Menu.Category(2, locale.csv_label)
+    other = Menu.Category(10, locale.other_features_label)
+
+    menu.add_category(sc_category)
+    menu.add_category(ktx_category)
+    menu.add_category(csv_category)
+    menu.add_category(other)
+
     try:
         import sc_compression
 
@@ -86,7 +96,6 @@ def refill_menu():
                 encode_textures_only,
             )
 
-            sc_category = Menu.Category(0, locale.sc_label)
             sc_category.add(
                 Menu.Item(
                     name=locale.decode_sc,
@@ -122,31 +131,27 @@ def refill_menu():
                     handler=lambda: collect_objects_and_encode(True),
                 )
             )
-            menu.add_category(sc_category)
 
             from system.lib.features.ktx import (
                 convert_ktx_textures_to_png,
                 convert_png_textures_to_ktx,
             )
 
-            ktx_category = Menu.Category(1, "KTX")
             ktx_category.add(
                 Menu.Item(
-                    name="png2ktx",
-                    description="Converts png to ktx",
+                    name=locale.ktx_from_png_label,
+                    description=locale.ktx_from_png_description,
                     handler=convert_png_textures_to_ktx,
                 )
             )
             ktx_category.add(
                 Menu.Item(
-                    name="ktx2png",
-                    description="Converts ktx to png",
+                    name=locale.ktx_from_png_label,
+                    description=locale.ktx_from_png_description,
                     handler=convert_ktx_textures_to_png,
                 )
             )
-            menu.add_category(ktx_category)
 
-        csv_category = Menu.Category(2, locale.csv_label)
         csv_category.add(
             Menu.Item(
                 name=locale.decompress_csv,
@@ -161,9 +166,7 @@ def refill_menu():
                 handler=compress_csv,
             )
         )
-        menu.add_category(csv_category)
 
-    other = Menu.Category(10, locale.other_features_label)
     other.add(
         Menu.Item(
             name=locale.check_update,
@@ -203,4 +206,3 @@ def refill_menu():
         )
     )
     other.add(Menu.Item(name=locale.exit, handler=lambda: (clear(), exit())))
-    menu.add_category(other)
