@@ -12,6 +12,9 @@ if TYPE_CHECKING:
     from system.lib.swf import SupercellSWF
 
 
+CACHE = {}
+
+
 class MovieClipFrame:
     def __init__(self):
         self._elements_count: int = 0
@@ -110,6 +113,9 @@ class MovieClip:
                 swf.reader.read(frame_length)
 
     def render(self, swf: "SupercellSWF", matrix=None) -> Image.Image:
+        if self in CACHE:
+            return CACHE[self].copy()
+
         matrix_bank = swf.get_matrix_bank(self.matrix_bank_index)
 
         # TODO: make it faster
@@ -136,6 +142,8 @@ class MovieClip:
                 y = int(abs(top) + position[1])
 
                 image.paste(rendered_shape, (x, y), rendered_shape)
+
+        CACHE[self] = image
 
         return image
 
@@ -171,3 +179,7 @@ class MovieClip:
                     bottom = max(bottom, shape_bottom)
 
         return left, top, right, bottom
+
+    def get_position(self) -> Tuple[float, float]:
+        left, top, _, _ = self.get_sides()
+        return left, top
