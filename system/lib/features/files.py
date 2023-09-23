@@ -31,7 +31,6 @@ def open_sc(input_filename: str) -> tuple[bytes, bool]:
 
     with open(input_filename, "rb") as f:
         file_data = f.read()
-        f.close()
 
     try:
         if b"START" in file_data:

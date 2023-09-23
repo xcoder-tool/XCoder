@@ -19,7 +19,6 @@ def get_run_output(command: str):
 
     with open(temp_filename) as f:
         file_data = f.read()
-        f.close()
 
     os.remove(temp_filename)
 

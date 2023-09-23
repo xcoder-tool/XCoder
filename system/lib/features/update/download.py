@@ -26,7 +26,6 @@ def download_update(zip_url):
 
         with open("updates/update.zip", "wb") as f:
             f.write(urllib.request.urlopen(zip_url).read())
-            f.close()
 
         import zipfile
 
