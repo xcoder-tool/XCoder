@@ -6,6 +6,7 @@
 /updates/
 /logs/
 /CSV/
+/TEX/
 /SC/
 
 # Configuration files
@@ -13,3 +14,6 @@ system/config.json
 
 # Python compiled files
 *.pyc
+
+# PVRTexToolCLI
+PVRTexToolCLI*

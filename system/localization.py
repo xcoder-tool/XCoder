@@ -40,6 +40,12 @@ class Locale:
         self.decompress_csv_description: str = DEFAULT_STRING
         self.compress_csv_description: str = DEFAULT_STRING
 
+        self.ktx_label: str = DEFAULT_STRING
+        self.ktx_from_png_label: str = DEFAULT_STRING
+        self.png_from_ktx_label: str = DEFAULT_STRING
+        self.ktx_from_png_description: str = DEFAULT_STRING
+        self.png_from_ktx_description: str = DEFAULT_STRING
+
         self.other_features_label: str = DEFAULT_STRING
         self.check_update: str = DEFAULT_STRING
         self.check_for_outdated: str = DEFAULT_STRING

@@ -1,23 +1,25 @@
 import os
 
 from loguru import logger
-from sc_compression import decompress
+from sc_compression import compress
 
 from system.localization import locale
 
 
-def decompress_csv():
-    folder = "./CSV/In-Compressed"
-    folder_export = "./CSV/Out-Decompressed"
+def update_csv():
+    from sc_compression.signatures import Signatures
 
-    for file in os.listdir(folder):
+    input_folder = "./CSV/In-Old"
+    export_folder = "./CSV/Out-Updated"
+
+    for file in os.listdir(input_folder):
         if file.endswith(".csv"):
             try:
-                with open(f"{folder}/{file}", "rb") as f:
+                with open(f"{input_folder}/{file}", "rb") as f:
                     file_data = f.read()
 
-                with open(f"{folder_export}/{file}", "wb") as f:
-                    f.write(decompress(file_data)[0])
+                with open(f"{export_folder}/{file}", "wb") as f:
+                    f.write(compress(file_data, Signatures.LZMA))
             except Exception as exception:
                 logger.exception(
                     locale.error

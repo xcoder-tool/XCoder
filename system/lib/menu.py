@@ -77,6 +77,9 @@ class Menu:
         self._print_divider_line(console_width)
 
         for category in self.categories:
+            if len(category.items) == 0:
+                continue
+
             print_category(category.name)
             for item_index in range(len(category.items)):
                 item = category.items[item_index]

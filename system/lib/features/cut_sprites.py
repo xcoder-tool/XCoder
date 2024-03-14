@@ -20,7 +20,7 @@ def render_objects(swf: SupercellSWF, output_folder: Path):
     #     rendered_movie_clip = movie_clip.render(swf)
     #     if sum(rendered_movie_clip.size) >= 2:
     #         clip_name = movie_clip.export_name or movie_clip.id
-    #         rendered_movie_clip.save(f"{export_folder}/movie_clips/{clip_name}.png")
+    #         rendered_movie_clip.save(f"{output_folder}/movie_clips/{clip_name}.png")
     #     else:
     #         # For debug:
     #         # logger.warning(f'MovieClip {movie_clip.id} cannot be rendered.')

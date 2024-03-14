@@ -1,10 +1,10 @@
-import os
 import platform
 
 from loguru import logger
 
-from system import run, clear
+from system import clear, run
 from system.lib import config
+from system.lib.features.directories import create_directories
 from system.lib.features.update.check import get_pip_info, get_tags
 from system.localization import locale
 
@@ -30,20 +30,7 @@ def initialize(first_init=False):
         else:
             logger.info(locale.not_installed % package)
     logger.info(locale.crt_workspace)
-    [
-        [
-            os.makedirs(f"SC/{i}-{k}", exist_ok=True)
-            for k in ["Compressed", "Decompressed", "Sprites"]
-        ]
-        for i in ["In", "Out"]
-    ]
-    [
-        [
-            os.makedirs(f"CSV/{i}-{k}", exist_ok=True)
-            for k in ["Compressed", "Decompressed"]
-        ]
-        for i in ["In", "Out"]
-    ]
+    create_directories()
     logger.info(locale.verifying)
 
     config.initialized = True
