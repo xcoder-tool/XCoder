@@ -32,6 +32,16 @@ Work with Supercell\`s files on **any** os! SC and CSV are supported for all Sup
   - Install loguru using pip;
   - In PyDroid open and execute "main.py" file.
 
+### How to enable KTX section
+
+![KTX section demo](docs/KTX section.png)
+
+**Supercell also uses KTX textures in new versions of the games, so it is advisable to perform this step.**
+
+To enable the KTX module, you need to get the "PVRTexToolCLI" binary from the official site: https://developer.imaginationtech.com/pvrtextool/. 
+
+Then it is necessary to put CLI in "system/bin/" folder in the main script folder.
+
 ### In the plans:
 - CSV updating.
 

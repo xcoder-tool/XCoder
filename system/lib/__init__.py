@@ -136,21 +136,23 @@ def refill_menu():
                 convert_ktx_textures_to_png,
                 convert_png_textures_to_ktx,
             )
+            from system.lib.pvr_tex_tool import can_use_pvr_tex_tool
 
-            ktx_category.add(
-                Menu.Item(
-                    name=locale.ktx_from_png_label,
-                    description=locale.ktx_from_png_description,
-                    handler=convert_png_textures_to_ktx,
+            if can_use_pvr_tex_tool():
+                ktx_category.add(
+                    Menu.Item(
+                        name=locale.ktx_from_png_label,
+                        description=locale.ktx_from_png_description,
+                        handler=convert_png_textures_to_ktx,
+                    )
                 )
-            )
-            ktx_category.add(
-                Menu.Item(
-                    name=locale.png_from_ktx_label,
-                    description=locale.png_from_ktx_description,
-                    handler=convert_ktx_textures_to_png,
+                ktx_category.add(
+                    Menu.Item(
+                        name=locale.png_from_ktx_label,
+                        description=locale.png_from_ktx_description,
+                        handler=convert_ktx_textures_to_png,
+                    )
                 )
-            )
 
         csv_category.add(
             Menu.Item(
