@@ -1,5 +1,9 @@
-import os
+from __future__ import annotations
 
+import os
+from typing import TYPE_CHECKING
+
+import zstandard
 from PIL import Image
 
 from system.lib.images import (
@@ -10,6 +14,9 @@ from system.lib.images import (
 )
 from system.lib.pvr_tex_tool import get_image_from_ktx_data
 
+if TYPE_CHECKING:
+    from system.lib.swf import SupercellSWF
+
 
 class SWFTexture:
     def __init__(self):
@@ -17,12 +24,15 @@ class SWFTexture:
         self.height = 0
 
         self.pixel_type = -1
+        self.khronos_texture_filename: str | None = None
 
-        self.image: Image.Image
+        self.image: Image.Image | None = None
 
-    def load(self, swf, tag: int, has_texture: bool):
+    def load(self, swf: SupercellSWF, tag: int, has_texture: bool):
         if tag == 45:
             khronos_texture_length = swf.reader.read_int()
+        elif tag == 47:
+            self.khronos_texture_filename = swf.reader.read_string()
 
         self.pixel_type = swf.reader.read_char()
         self.width, self.height = (swf.reader.read_ushort(), swf.reader.read_ushort())
@@ -34,6 +44,14 @@ class SWFTexture:
             # noinspection PyUnboundLocalVariable
             khronos_texture_data = swf.reader.read(khronos_texture_length)
             self.image = get_image_from_ktx_data(khronos_texture_data)
+            return
+        elif tag == 47:
+            with open(
+                swf.filepath.parent / self.khronos_texture_filename, "rb"
+            ) as file:
+                decompressor = zstandard.ZstdDecompressor()
+                decompressed = decompressor.decompress(file.read())
+                self.image = get_image_from_ktx_data(decompressed)
             return
 
         img = Image.new(

@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from typing import List, Tuple
 
 from loguru import logger
@@ -14,15 +15,15 @@ DEFAULT_LOWRES_SUFFIX = "_lowres"
 
 
 class SupercellSWF:
-    TEXTURES_TAGS = (1, 16, 28, 29, 34, 19, 24, 27, 45)
+    TEXTURES_TAGS = (1, 16, 28, 29, 34, 19, 24, 27, 45, 47)
     SHAPES_TAGS = (2, 18)
-    MOVIE_CLIPS_TAGS = (3, 10, 12, 14, 35)
+    MOVIE_CLIPS_TAGS = (3, 10, 12, 14, 35, 49)
 
     TEXTURE_EXTENSION = "_tex.sc"
 
     def __init__(self):
-        self.filename: str
-        self.reader: Reader
+        self.filename: str | None = None
+        self.reader: Reader | None = None
 
         self.use_lowres_texture: bool = False
 
@@ -32,8 +33,8 @@ class SupercellSWF:
 
         self.xcod_writer = Writer("big")
 
-        self._filepath: str
-        self._uncommon_texture_path: str
+        self._filepath: Path | None = None
+        self._uncommon_texture_path: str | os.PathLike | None = None
 
         self._lowres_suffix: str = DEFAULT_LOWRES_SUFFIX
         self._highres_suffix: str = DEFAULT_HIGHRES_SUFFIX
@@ -50,13 +51,13 @@ class SupercellSWF:
         self._export_names: List[str] = []
 
         self._matrix_banks: List[MatrixBank] = []
-        self._matrix_bank: MatrixBank
+        self._matrix_bank: MatrixBank | None = None
 
     def load(self, filepath: str | os.PathLike) -> Tuple[bool, bool]:
-        self._filepath = str(filepath)
+        self._filepath = Path(filepath)
 
         texture_loaded, use_lzham = self._load_internal(
-            self._filepath, self._filepath.endswith("_tex.sc")
+            self._filepath, self._filepath.name.endswith("_tex.sc")
         )
 
         if not texture_loaded:
@@ -65,12 +66,14 @@ class SupercellSWF:
                     self._uncommon_texture_path, True
                 )
             else:
-                texture_path = self._filepath[:-3] + SupercellSWF.TEXTURE_EXTENSION
+                texture_path = str(self._filepath)[:-3] + SupercellSWF.TEXTURE_EXTENSION
                 texture_loaded, use_lzham = self._load_internal(texture_path, True)
 
         return texture_loaded, use_lzham
 
-    def _load_internal(self, filepath: str, is_texture_file: bool) -> Tuple[bool, bool]:
+    def _load_internal(
+        self, filepath: str | os.PathLike, is_texture_file: bool
+    ) -> Tuple[bool, bool]:
         self.filename = os.path.basename(filepath)
 
         logger.info(locale.collecting_inf % self.filename)
@@ -180,12 +183,12 @@ class SupercellSWF:
             elif tag == 30:
                 self._use_uncommon_texture = True
                 highres_texture_path = (
-                    self._filepath[:-3]
+                    str(self._filepath)[:-3]
                     + self._highres_suffix
                     + SupercellSWF.TEXTURE_EXTENSION
                 )
                 lowres_texture_path = (
-                    self._filepath[:-3]
+                    str(self._filepath)[:-3]
                     + self._lowres_suffix
                     + SupercellSWF.TEXTURE_EXTENSION
                 )
@@ -231,3 +234,7 @@ class SupercellSWF:
 
     def get_matrix_bank(self, index: int) -> MatrixBank:
         return self._matrix_banks[index]
+
+    @property
+    def filepath(self) -> Path:
+        return self._filepath

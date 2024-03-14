@@ -62,6 +62,9 @@ class MovieClip:
         if tag in (3, 14):
             pass
         else:
+            if tag == 49:
+                swf.reader.read_char()  # unknown
+
             transforms_count = swf.reader.read_uint()
 
             for i in range(transforms_count):
@@ -79,7 +82,7 @@ class MovieClip:
             bind_id = swf.reader.read_ushort()  # bind_id
             self.binds.append(bind_id)
 
-        if tag in (12, 35):
+        if tag in (12, 35, 49):
             for i in range(binds_count):
                 blend = swf.reader.read_char()  # blend
                 self.blends.append(blend)

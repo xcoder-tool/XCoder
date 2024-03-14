@@ -59,7 +59,7 @@ def decode_and_render_objects():
     files = os.listdir(input_folder)
 
     for file in files:
-        if file.endswith("_tex.sc"):
+        if file.endswith("_tex.sc") or not file.endswith(".sc"):
             continue
 
         try:
@@ -99,9 +99,9 @@ def get_file_basename(swf: SupercellSWF):
 
 def _create_objects_output_folder(output_folder: Path, base_name: str) -> Path:
     objects_output_folder = output_folder / base_name
-    if os.path.isdir(objects_output_folder):
+    if objects_output_folder.exists():
         shutil.rmtree(objects_output_folder)
-    os.mkdir(objects_output_folder)
+    objects_output_folder.mkdir(parents=True)
     return objects_output_folder
 
 
