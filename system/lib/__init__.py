@@ -146,8 +146,8 @@ def refill_menu():
             )
             ktx_category.add(
                 Menu.Item(
-                    name=locale.ktx_from_png_label,
-                    description=locale.ktx_from_png_description,
+                    name=locale.png_from_ktx_label,
+                    description=locale.png_from_ktx_description,
                     handler=convert_ktx_textures_to_png,
                 )
             )
