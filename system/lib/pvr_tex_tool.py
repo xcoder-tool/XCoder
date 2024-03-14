@@ -7,7 +7,7 @@ from PIL import Image
 from system import run
 
 TOOL_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-PIXEL_FORMAT = "r8g8b8a8,UBN,lRGB"
+COLOR_SPACE = "sRGB"
 KTX_FORMAT = "ETC1,UBN,lRGB"
 QUALITY = "etcfast"
 CLI_PATH = f"{TOOL_DIR}/system/bin/PVRTexToolCLI"
@@ -40,7 +40,7 @@ def convert_ktx_to_png(filepath: Path, output_folder: Path | None = None) -> Pat
     if output_folder is not None:
         output_filepath = output_folder / output_filepath.name
 
-    run(f"{CLI_PATH} -noout -i {filepath!s} -d {output_filepath!s}")
+    run(f"{CLI_PATH} -noout -ics {COLOR_SPACE} -i {filepath!s} -d {output_filepath!s}")
 
     return output_filepath
 
