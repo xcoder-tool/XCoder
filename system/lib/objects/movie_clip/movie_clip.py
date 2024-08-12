@@ -2,10 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from PIL import Image
-
-from system.bytestream import Reader
-from system.lib.matrices import Matrix2x3
+from ..plain_object import PlainObject
+from .movie_clip_frame import MovieClipFrame
 
 if TYPE_CHECKING:
     from system.lib.swf import SupercellSWF
@@ -14,38 +12,14 @@ if TYPE_CHECKING:
 CACHE = {}
 
 
-class MovieClipFrame:
-    def __init__(self):
-        self._elements_count: int = 0
-        self._label: str | None = None
-
-        self._elements: list[tuple[int, int, int]] = []
-
-    def load(self, reader: Reader) -> None:
-        self._elements_count = reader.read_short()
-        self._label = reader.read_string()
-
-    def get_elements_count(self) -> int:
-        return self._elements_count
-
-    def set_elements(self, elements: list[tuple[int, int, int]]) -> None:
-        self._elements = elements
-
-    def get_elements(self) -> list[tuple[int, int, int]]:
-        return self._elements
-
-    def get_element(self, index: int) -> tuple[int, int, int]:
-        return self._elements[index]
-
-
-class MovieClip:
+class MovieClip(PlainObject):
     def __init__(self):
         super().__init__()
 
         self.id = -1
         self.export_name: str | None = None
         self.fps: int = 30
-        self.frames_count: int = 0
+        self.frame_count: int = 0
         self.frames: list[MovieClipFrame] = []
         self.frame_elements: list[tuple[int, int, int]] = []
         self.blends: list[int] = []
@@ -56,7 +30,7 @@ class MovieClip:
         self.id = swf.reader.read_ushort()
 
         self.fps = swf.reader.read_char()
-        self.frames_count = swf.reader.read_ushort()
+        self.frame_count = swf.reader.read_ushort()
 
         if tag in (3, 14):
             pass
@@ -113,6 +87,3 @@ class MovieClip:
                 self.matrix_bank_index = swf.reader.read_uchar()
             else:
                 swf.reader.read(frame_length)
-
-    def render(self, swf: SupercellSWF, matrix: Matrix2x3 | None = None) -> Image.Image:
-        raise Exception("Not implemented yet")

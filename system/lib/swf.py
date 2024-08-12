@@ -7,6 +7,7 @@ from system.bytestream import Reader, Writer
 from system.lib.features.files import open_sc
 from system.lib.matrices.matrix_bank import MatrixBank
 from system.lib.objects import MovieClip, Shape, SWFTexture
+from system.lib.objects.plain_object import PlainObject
 from system.localization import locale
 
 DEFAULT_HIGHRES_SUFFIX = "_highres"
@@ -212,7 +213,7 @@ class SupercellSWF:
 
     def get_display_object(
         self, target_id: int, name: str | None = None, *, raise_error: bool = False
-    ) -> Shape | MovieClip | None:
+    ) -> PlainObject | None:
         for shape in self.shapes:
             if shape.id == target_id:
                 return shape
