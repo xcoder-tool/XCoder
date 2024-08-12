@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from math import atan2, ceil, degrees
 from typing import TYPE_CHECKING, List, Optional, Tuple
 
@@ -17,7 +19,7 @@ class Shape:
         self.id = 0
         self.regions: List[Region] = []
 
-    def load(self, swf: "SupercellSWF", tag: int):
+    def load(self, swf: SupercellSWF, tag: int):
         self.id = swf.reader.read_ushort()
 
         swf.reader.read_ushort()  # regions_count
@@ -101,7 +103,7 @@ class Region:
 
         self.texture: SWFTexture
 
-    def load(self, swf: "SupercellSWF", tag: int):
+    def load(self, swf: SupercellSWF, tag: int):
         self.texture_index = swf.reader.read_uchar()
 
         self.texture = swf.textures[self.texture_index]
@@ -161,10 +163,10 @@ class Region:
 
         rendered_region = rendered_region.rotate(-self.rotation, expand=True)
         if self.is_mirrored:
-            rendered_region = rendered_region.transpose(Image.FLIP_LEFT_RIGHT)
+            rendered_region = rendered_region.transpose(Image.Transpose.FLIP_LEFT_RIGHT)
         if use_original_size:
             return rendered_region
-        return rendered_region.resize((width, height), Image.ANTIALIAS)
+        return rendered_region.resize((width, height), Image.Resampling.LANCZOS)
 
     def get_image(self) -> Image.Image:
         left, top, right, bottom = get_sides(self._uv_points)

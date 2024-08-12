@@ -1,7 +1,10 @@
 import os
 from pathlib import Path
 
+from loguru import logger
+
 from system.lib.pvr_tex_tool import convert_ktx_to_png, convert_png_to_ktx
+from system.localization import locale
 
 IN_PNG_PATH = Path("./TEX/In-PNG")
 IN_KTX_PATH = Path("./TEX/In-KTX")
@@ -21,6 +24,7 @@ def convert_png_textures_to_ktx():
         if not os.path.isfile(png_filepath):
             continue
 
+        logger.info(locale.collecting_inf % file)
         convert_png_to_ktx(png_filepath, output_folder=output_folder)
 
 
@@ -36,4 +40,5 @@ def convert_ktx_textures_to_png():
         if not os.path.isfile(ktx_filepath):
             continue
 
+        logger.info(locale.collecting_inf % file)
         convert_ktx_to_png(ktx_filepath, output_folder=output_folder)

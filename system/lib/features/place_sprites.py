@@ -85,9 +85,9 @@ def place_sprites(
                 f'{folder}{"/overwrite" if overwrite else ""}/{filename}'
             ).convert("RGBA")
             if region_info.is_mirrored:
-                tmp_region = tmp_region.transpose(Image.FLIP_LEFT_RIGHT)
+                tmp_region = tmp_region.transpose(Image.Transpose.FLIP_LEFT_RIGHT)
             tmp_region = tmp_region.rotate(region_info.rotation, expand=True)
-            tmp_region = tmp_region.resize((width, height), Image.ANTIALIAS)
+            tmp_region = tmp_region.resize((width, height), Image.Resampling.LANCZOS)
 
             sheets[region_info.texture_id].paste(
                 Image.new("RGBA", (width, height)), (left, top), img_mask.crop(bbox)

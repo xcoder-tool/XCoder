@@ -35,7 +35,7 @@ def compile_sc(
 
             if Console.question(locale.resize_qu):
                 logger.info(locale.resizing)
-                sheet = sheet.resize(sheet_info.size, Image.ANTIALIAS)
+                sheet = sheet.resize(sheet_info.size, Image.Resampling.LANCZOS)
 
         width, height = sheet.size
         pixel_size = get_byte_count_by_pixel_type(pixel_type)
