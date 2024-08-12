@@ -61,7 +61,7 @@ class Region:
         width, height = max(int(rect.width), 1), max(int(rect.height), 1)
 
         self.rotation, self.is_mirrored = compare_polygons(
-            transformed_points, self._uv_points, True
+            transformed_points, self._uv_points
         )
 
         rendered_region = self.get_image()
@@ -72,9 +72,9 @@ class Region:
                 rendered_region.mode, width, height, transformed_points, fill_color
             )
 
-        rendered_region = rendered_region.rotate(-self.rotation, expand=True)
         if self.is_mirrored:
             rendered_region = rendered_region.transpose(Image.Transpose.FLIP_LEFT_RIGHT)
+        rendered_region = rendered_region.rotate(-self.rotation, expand=True)
 
         if use_original_size:
             return rendered_region

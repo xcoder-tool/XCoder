@@ -25,13 +25,11 @@ def is_clockwise(polygon: Polygon) -> bool:
 def compare_polygons(
     polygon1: Polygon,
     polygon2: Polygon,
-    round_to_nearest: bool = False,
 ) -> tuple[int, bool]:
     """Calculates rotation and if polygon is mirrored.
 
     :param polygon1: shape polygon
     :param polygon2: sheet polygon
-    :param round_to_nearest: should round to a multiple of 90
     :return: rotation degrees, is polygon mirrored
     """
 
@@ -45,18 +43,10 @@ def compare_polygons(
     du = polygon2[1].x - polygon2[0].x
     dv = polygon2[1].y - polygon2[0].y
 
-    angle_xy = degrees(atan2(dy, dx)) % 360
-    angle_uv = degrees(atan2(dv, du)) % 360
+    angle_xy = degrees(atan2(dy, dx))
+    angle_uv = degrees(atan2(dv, du))
 
-    angle = angle_xy - angle_uv
-
-    if mirroring:
-        angle -= 180
-
-    angle = (angle + 360) % 360
-
-    if round_to_nearest:
-        angle = round(angle / 90) * 90
+    angle = (angle_xy - angle_uv) % 360
 
     return int(angle), mirroring
 
