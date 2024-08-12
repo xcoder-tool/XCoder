@@ -7,20 +7,31 @@ from PIL import Image
 from system import run
 from system.exceptions.tool_not_found import ToolNotFoundException
 
-TOOL_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-COLOR_SPACE = "sRGB"
-KTX_FORMAT = "ETC1,UBN,lRGB"
-QUALITY = "etcfast"
-CLI_PATH = f"{TOOL_DIR}/system/bin/PVRTexToolCLI"
+_main_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+_color_space = "sRGB"
+_format = "ETC1,UBN,lRGB"
+_quality = "etcfast"
 
 
 # Note: a solution from
 # https://stackoverflow.com/questions/11210104/check-if-a-program-exists-from-a-python-script
-def can_use_pvr_tex_tool() -> bool:
+def _get_executable_path(*paths: str) -> str | None:
     from distutils.spawn import find_executable
 
-    executable_path = find_executable(CLI_PATH)
-    return executable_path is not None
+    for path in paths:
+        executable_path = find_executable(path)
+        if executable_path is not None:
+            return path
+
+    return None
+
+
+_cli_name = "PVRTexToolCLI"
+_cli_path = _get_executable_path(_cli_name, f"{_main_dir}/system/bin/{_cli_name}")
+
+
+def can_use_pvr_tex_tool() -> bool:
+    return _cli_path is not None
 
 
 def get_image_from_ktx_data(data: bytes) -> Image.Image:
@@ -52,7 +63,9 @@ def convert_ktx_to_png(filepath: Path, output_folder: Path | None = None) -> Pat
     if output_folder is not None:
         output_filepath = output_folder / output_filepath.name
 
-    run(f"{CLI_PATH} -noout -ics {COLOR_SPACE} -i {filepath!s} -d {output_filepath!s}")
+    run(
+        f"{_cli_path} -noout -ics {_color_space} -i {filepath!s} -d {output_filepath!s}"
+    )
 
     return output_filepath
 
@@ -65,8 +78,7 @@ def convert_png_to_ktx(filepath: Path, output_folder: Path | None = None) -> Pat
         output_filepath = output_folder / output_filepath.name
 
     run(
-        f"{CLI_PATH} -f {KTX_FORMAT} -q {QUALITY} "
-        f"-i {filepath!s} -o {output_filepath!s}"
+        f"{_cli_path} -f {_format} -q {_quality} -i {filepath!s} -o {output_filepath!s}"
     )
 
     return output_filepath

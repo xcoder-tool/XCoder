@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from math import ceil
 from typing import TYPE_CHECKING, List, Tuple
 
@@ -53,7 +55,7 @@ class MovieClip:
         self.binds: List[int] = []
         self.matrix_bank_index: int = 0
 
-    def load(self, swf: "SupercellSWF", tag: int):
+    def load(self, swf: SupercellSWF, tag: int):
         self.id = swf.reader.read_ushort()
 
         self.fps = swf.reader.read_char()
@@ -115,7 +117,7 @@ class MovieClip:
             else:
                 swf.reader.read(frame_length)
 
-    def render(self, swf: "SupercellSWF", matrix=None) -> Image.Image:
+    def render(self, swf: SupercellSWF, matrix=None) -> Image.Image:
         if self in CACHE:
             return CACHE[self].copy()
 
@@ -150,7 +152,7 @@ class MovieClip:
 
         return image
 
-    def get_sides(self, swf: "SupercellSWF") -> Tuple[float, float, float, float]:
+    def get_sides(self, swf: SupercellSWF) -> Tuple[float, float, float, float]:
         matrix_bank: MatrixBank = swf.get_matrix_bank(self.matrix_bank_index)
 
         left = 0

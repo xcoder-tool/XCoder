@@ -78,7 +78,7 @@
     "not_found": "File '%s' not found!",
     "cut_sprites_process": "Cutting sprites... (%d/%d)",
     "place_sprites_process": "Placing sprites... (%d/%d)",
-    "not_implemented": "This feature will be added in future updates.\nYou can follow XCoder updates here: github.com/Vorono4ka/XCoder",
+    "not_implemented": "This feature will be added in future updates.\nYou can follow XCoder updates here: https://github.com/Vorono4ka/XCoder",
     "error": "ERROR! (%s.%s: %s)",
     "e1sc1": "Overwrite SC sprites",
 	"cgl": "Changelog:\n%s",

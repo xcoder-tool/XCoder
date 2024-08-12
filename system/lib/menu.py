@@ -73,7 +73,7 @@ class Menu:
                 + colorama.Style.RESET_ALL
             ).center(console_width + 12)
         )
-        print("github.com/Vorono4ka/XCoder".center(console_width - 1))
+        print("https://github.com/Vorono4ka/XCoder".center(console_width - 1))
         self._print_divider_line(console_width)
 
         for category in self.categories:
