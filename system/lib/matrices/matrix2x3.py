@@ -5,11 +5,17 @@ PRECISE_MULTIPLIER = 65535
 
 
 class Matrix2x3:
+    """
+    This matrix looks like:
+    [a c x]
+    [b d y]
+    """
+
     def __init__(self):
-        self.shear_x: float = 0
-        self.shear_y: float = 0
-        self.scale_x: float = 1
-        self.scale_y: float = 1
+        self.a: float = 1
+        self.b: float = 0
+        self.c: float = 0
+        self.d: float = 1
         self.x: float = 0
         self.y: float = 0
 
@@ -22,15 +28,15 @@ class Matrix2x3:
         else:
             raise ValueError(f"Unsupported matrix tag: {tag}")
 
-        self.scale_x = reader.read_int() / divider
-        self.shear_x = reader.read_int() / divider
-        self.shear_y = reader.read_int() / divider
-        self.scale_y = reader.read_int() / divider
+        self.a = reader.read_int() / divider
+        self.b = reader.read_int() / divider
+        self.c = reader.read_int() / divider
+        self.d = reader.read_int() / divider
         self.x = reader.read_twip()
         self.y = reader.read_twip()
 
     def apply_x(self, x: float, y: float):
-        return x * self.scale_x + y * self.shear_y + self.x
+        return x * self.a + y * self.c + self.x
 
     def apply_y(self, x: float, y: float):
-        return y * self.scale_y + x * self.shear_x + self.y
+        return y * self.d + x * self.b + self.y

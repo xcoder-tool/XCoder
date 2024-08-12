@@ -1,6 +1,5 @@
 import os
 from pathlib import Path
-from typing import List, Tuple
 
 from loguru import logger
 
@@ -27,9 +26,9 @@ class SupercellSWF:
 
         self.use_lowres_texture: bool = False
 
-        self.shapes: List[Shape] = []
-        self.movie_clips: List[MovieClip] = []
-        self.textures: List[SWFTexture] = []
+        self.shapes: list[Shape] = []
+        self.movie_clips: list[MovieClip] = []
+        self.textures: list[SWFTexture] = []
 
         self.xcod_writer = Writer("big")
 
@@ -47,13 +46,13 @@ class SupercellSWF:
         self._text_field_count: int = 0
 
         self._export_count: int = 0
-        self._export_ids: List[int] = []
-        self._export_names: List[str] = []
+        self._export_ids: list[int] = []
+        self._export_names: list[str] = []
 
-        self._matrix_banks: List[MatrixBank] = []
+        self._matrix_banks: list[MatrixBank] = []
         self._matrix_bank: MatrixBank | None = None
 
-    def load(self, filepath: str | os.PathLike) -> Tuple[bool, bool]:
+    def load(self, filepath: str | os.PathLike) -> tuple[bool, bool]:
         self._filepath = Path(filepath)
 
         texture_loaded, use_lzham = self._load_internal(
@@ -73,7 +72,7 @@ class SupercellSWF:
 
     def _load_internal(
         self, filepath: str | os.PathLike, is_texture_file: bool
-    ) -> Tuple[bool, bool]:
+    ) -> tuple[bool, bool]:
         self.filename = os.path.basename(filepath)
 
         logger.info(locale.collecting_inf % self.filename)

@@ -1,10 +1,12 @@
 import math
 
 import PIL.PyAccess
-from PIL import Image
+from PIL import Image, ImageDraw
 
 from system.bytestream import Reader, Writer
 from system.lib.console import Console
+from system.lib.math.point import Point
+from system.lib.matrices import Matrix2x3
 from system.lib.pixel_utils import (
     get_channel_count_by_pixel_type,
     get_read_function,
@@ -17,7 +19,6 @@ CHUNK_SIZE = 32
 
 def load_image_from_buffer(img: Image.Image) -> None:
     width, height = img.size
-    # noinspection PyTypeChecker
     img_loaded: PIL.PyAccess.PyAccess = img.load()  # type: ignore
 
     with open("pixel_buffer", "rb") as pixel_buffer:
@@ -198,13 +199,13 @@ def transform_image(image, scale_x, scale_y, angle, x, y):
 
     return image.transform(
         (translated_w, translated_h),
-        Image.AFFINE,
+        Image.Transform.AFFINE,
         (a, b, c, d, e, f),
-        resample=Image.BILINEAR,
+        resample=Image.Resampling.BILINEAR,
     )
 
 
-def translate_image(image, x, y):
+def translate_image(image, x: float, y: float) -> Image.Image:
     w, h = image.size
 
     translated_w = int(math.ceil(w + math.fabs(x)))
@@ -216,23 +217,29 @@ def translate_image(image, x, y):
 
     return image.transform(
         (translated_w, translated_h),
-        Image.AFFINE,
+        Image.Transform.AFFINE,
         (1, 0, -x, 0, 1, -y),
-        resample=Image.BILINEAR,
+        resample=Image.Resampling.BILINEAR,
     )
 
 
-def transform_image_by_matrix(image, matrix: list or tuple):
-    scale_x, rotation_x, x = matrix[:3]
-    rotation_y, scale_y, y = matrix[3:]
-    return transform_image(
-        image, scale_x, scale_y, math.atan2(rotation_x, rotation_y), x, y
+def transform_image_by_matrix(image: Image.Image, matrix: Matrix2x3):
+    new_width = matrix.apply_x(image.width, image.height)
+    new_height = matrix.apply_y(image.width, image.height)
+
+    return image.transform(
+        (new_width, new_height),
+        Image.Transform.AFFINE,
+        (matrix.a, matrix.b, matrix.x, matrix.c, matrix.d, matrix.y),
+        resample=Image.Resampling.BILINEAR,
     )
 
 
-if __name__ == "__main__":
-    transform_image_by_matrix(
-        Image.open("../../test_0.png"),
-        [1.0458984375, 0.0, -127.65, 0.0, 1.0458984375, -700.0],
-    ).show()
-    input()
+def create_filled_polygon_image(
+    mode: str, width: int, height: int, polygon: list[Point], color: int
+) -> Image.Image:
+    mask_image = Image.new(mode, (width, height), 0)
+    drawable_image = ImageDraw.Draw(mask_image)
+    drawable_image.polygon([point.as_tuple() for point in polygon], fill=color)
+
+    return mask_image

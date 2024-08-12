@@ -67,9 +67,9 @@ def render_objects(swf: SupercellSWF, output_folder: Path):
             region = shape.regions[region_index]
 
             swf.xcod_writer.write_ubyte(region.texture_index)
-            swf.xcod_writer.write_ubyte(region.get_points_count())
+            swf.xcod_writer.write_ubyte(region.get_point_count())
 
-            for i in range(region.get_points_count()):
+            for i in range(region.get_point_count()):
                 swf.xcod_writer.write_uint16(int(region.get_u(i)))
                 swf.xcod_writer.write_uint16(int(region.get_v(i)))
             swf.xcod_writer.write_ubyte(1 if region.is_mirrored else 0)

@@ -1,14 +1,11 @@
 from __future__ import annotations
 
-from math import ceil
-from typing import TYPE_CHECKING, List, Tuple
+from typing import TYPE_CHECKING
 
 from PIL import Image
 
 from system.bytestream import Reader
-from system.lib.helper import get_size
-from system.lib.matrices.matrix_bank import MatrixBank
-from system.lib.objects.shape import Shape
+from system.lib.matrices import Matrix2x3
 
 if TYPE_CHECKING:
     from system.lib.swf import SupercellSWF
@@ -22,7 +19,7 @@ class MovieClipFrame:
         self._elements_count: int = 0
         self._label: str | None = None
 
-        self._elements: List[Tuple[int, int, int]] = []
+        self._elements: list[tuple[int, int, int]] = []
 
     def load(self, reader: Reader) -> None:
         self._elements_count = reader.read_short()
@@ -31,13 +28,13 @@ class MovieClipFrame:
     def get_elements_count(self) -> int:
         return self._elements_count
 
-    def set_elements(self, elements: List[Tuple[int, int, int]]) -> None:
+    def set_elements(self, elements: list[tuple[int, int, int]]) -> None:
         self._elements = elements
 
-    def get_elements(self) -> List[Tuple[int, int, int]]:
+    def get_elements(self) -> list[tuple[int, int, int]]:
         return self._elements
 
-    def get_element(self, index: int) -> Tuple[int, int, int]:
+    def get_element(self, index: int) -> tuple[int, int, int]:
         return self._elements[index]
 
 
@@ -49,10 +46,10 @@ class MovieClip:
         self.export_name: str | None = None
         self.fps: int = 30
         self.frames_count: int = 0
-        self.frames: List[MovieClipFrame] = []
-        self.frame_elements: List[Tuple[int, int, int]] = []
-        self.blends: List[int] = []
-        self.binds: List[int] = []
+        self.frames: list[MovieClipFrame] = []
+        self.frame_elements: list[tuple[int, int, int]] = []
+        self.blends: list[int] = []
+        self.binds: list[int] = []
         self.matrix_bank_index: int = 0
 
     def load(self, swf: SupercellSWF, tag: int):
@@ -117,74 +114,5 @@ class MovieClip:
             else:
                 swf.reader.read(frame_length)
 
-    def render(self, swf: SupercellSWF, matrix=None) -> Image.Image:
-        if self in CACHE:
-            return CACHE[self].copy()
-
-        matrix_bank = swf.get_matrix_bank(self.matrix_bank_index)
-
-        # TODO: make it faster
-        left, top, right, bottom = self.get_sides(swf)
-
-        width, height = get_size(left, top, right, bottom)
-        size = ceil(width), ceil(height)
-        image = Image.new("RGBA", size)
-
-        frame = self.frames[0]
-        for child_index, matrix_index, _ in frame.get_elements():
-            if matrix_index != 65535:
-                matrix = matrix_bank.get_matrix(matrix_index)
-            else:
-                matrix = None
-
-            display_object = swf.get_display_object(self.binds[child_index])
-            if isinstance(display_object, Shape):
-                rendered_shape = display_object.render(matrix)
-
-                # TODO: fix position
-                position = display_object.get_position()
-                x = int(abs(left) + position[0])
-                y = int(abs(top) + position[1])
-
-                image.paste(rendered_shape, (x, y), rendered_shape)
-
-        CACHE[self] = image
-
-        return image
-
-    def get_sides(self, swf: SupercellSWF) -> Tuple[float, float, float, float]:
-        matrix_bank: MatrixBank = swf.get_matrix_bank(self.matrix_bank_index)
-
-        left = 0
-        top = 0
-        right = 0
-        bottom = 0
-
-        for frame in self.frames:
-            for child_index, matrix_index, _ in frame.get_elements():
-                if matrix_index != 65535:
-                    matrix = matrix_bank.get_matrix(matrix_index)
-                else:
-                    matrix = None
-
-                display_object = swf.get_display_object(self.binds[child_index])
-                if isinstance(display_object, Shape):
-                    display_object.apply_matrix(matrix)
-
-                    (
-                        shape_left,
-                        shape_top,
-                        shape_right,
-                        shape_bottom,
-                    ) = display_object.get_sides()
-
-                    left = min(left, shape_left)
-                    top = min(top, shape_top)
-                    right = max(right, shape_right)
-                    bottom = max(bottom, shape_bottom)
-
-        return left, top, right, bottom
-
-    def get_position(self) -> Tuple[float, float]:
-        left, top, _, _ = self.get_sides()
-        return left, top
+    def render(self, swf: SupercellSWF, matrix: Matrix2x3 | None = None) -> Image.Image:
+        raise Exception("Not implemented yet")

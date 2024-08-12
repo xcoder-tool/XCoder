@@ -1,6 +1,5 @@
 import struct
 from pathlib import Path
-from typing import List
 
 from loguru import logger
 from PIL import Image
@@ -16,7 +15,7 @@ from system.localization import locale
 def compile_sc(
     output_folder: Path,
     file_info: FileInfo,
-    sheets: List[Image.Image],
+    sheets: list[Image.Image],
 ):
     sc = Writer()
 

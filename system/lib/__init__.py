@@ -195,9 +195,9 @@ def refill_menu():
         Menu.Item(
             name=locale.clear_directories,
             description=locale.clean_dirs_description,
-            handler=lambda: clear_directories()
-            if Console.question(locale.clear_qu)
-            else -1,
+            handler=lambda: (
+                clear_directories() if Console.question(locale.clear_qu) else -1
+            ),
         )
     )
     other.add(

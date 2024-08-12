@@ -3,11 +3,11 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Tuple
 
 from loguru import logger
 
 from system.bytestream import Reader
+from system.lib.math.point import Point
 from system.localization import locale
 
 
@@ -15,7 +15,7 @@ from system.localization import locale
 class SheetInfo:
     file_type: int
     pixel_type: int
-    size: Tuple[int, int]
+    size: tuple[int, int]
 
     @property
     def width(self) -> int:
@@ -29,7 +29,7 @@ class SheetInfo:
 @dataclass
 class RegionInfo:
     texture_id: int
-    points: list[tuple[int, int]]
+    points: list[Point]
     is_mirrored: bool
     rotation: int
 
@@ -91,7 +91,7 @@ def parse_detailed_info(file_info: FileInfo, reader: Reader) -> None:
             texture_id, points_count = reader.read_uchar(), reader.read_uchar()
 
             points = [
-                (reader.read_ushort(), reader.read_ushort())
+                Point(reader.read_ushort(), reader.read_ushort())
                 for _ in range(points_count)
             ]
 

@@ -1,5 +1,5 @@
 import io
-from typing import Literal, Optional
+from typing import Literal
 
 
 class Reader(io.BytesIO):
@@ -68,7 +68,7 @@ class Writer(io.BytesIO):
     def write_int32(self, integer: int):
         self.write_int(integer, 4, True)
 
-    def write_string(self, string: Optional["str"] = None):
+    def write_string(self, string: str | None = None):
         if string is None:
             self.write_byte(255)
             return
