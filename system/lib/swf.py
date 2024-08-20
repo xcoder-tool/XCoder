@@ -35,7 +35,7 @@ class SupercellSWF:
         self.xcod_writer = Writer("big")
 
         self._filepath: Path | None = None
-        self._uncommon_texture_path: str | os.PathLike | None = None
+        self._uncommon_texture_path: os.PathLike | str | None = None
 
         self._lowres_suffix: str = DEFAULT_LOWRES_SUFFIX
         self._highres_suffix: str = DEFAULT_HIGHRES_SUFFIX
@@ -63,6 +63,7 @@ class SupercellSWF:
 
         if not texture_loaded:
             if self._use_uncommon_texture:
+                assert self._uncommon_texture_path is not None
                 texture_loaded, signature = self._load_internal(
                     self._uncommon_texture_path, True
                 )
@@ -73,7 +74,7 @@ class SupercellSWF:
         return texture_loaded, signature
 
     def _load_internal(
-        self, filepath: str | os.PathLike, is_texture_file: bool
+        self, filepath: os.PathLike | str, is_texture_file: bool
     ) -> tuple[bool, Signatures]:
         self.filename = os.path.basename(filepath)
 
@@ -136,6 +137,8 @@ class SupercellSWF:
         return loaded, signature
 
     def _load_tags(self, is_texture_file: bool) -> bool:
+        assert self.reader is not None
+
         has_texture = True
 
         texture_id = 0
@@ -183,6 +186,7 @@ class SupercellSWF:
                 self.movie_clips[movie_clips_loaded].load(self, tag)
                 movie_clips_loaded += 1
             elif tag == 8 or tag == 36:  # Matrix
+                assert self._matrix_bank is not None
                 self._matrix_bank.get_matrix(matrices_loaded).load(self.reader, tag)
                 matrices_loaded += 1
             elif tag == 26:
@@ -244,4 +248,5 @@ class SupercellSWF:
 
     @property
     def filepath(self) -> Path:
+        assert self._filepath is not None
         return self._filepath

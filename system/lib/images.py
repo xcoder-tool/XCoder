@@ -86,7 +86,7 @@ def split_image(img: Image.Image) -> None:
                     if pixel_x >= width:
                         break
 
-                    add_pixel(loaded_clone[pixel_x, pixel_y])
+                    add_pixel(loaded_clone[pixel_x, pixel_y])  # type: ignore
                     pixel_index += 1
 
         Console.progress_bar(locale.split_pic, y_chunk, y_chunks_count + 1)
@@ -149,7 +149,7 @@ def save_texture(writer: Writer, image: Image.Image, pixel_type: int) -> None:
     point = -1
     for y in range(height):
         for x in range(width):
-            writer.write(write_pixel(pixels[y * width + x]))
+            writer.write(write_pixel(pixels[y * width + x]))  # type: ignore
 
         curr = Console.percent(y, height)
         if curr > point:

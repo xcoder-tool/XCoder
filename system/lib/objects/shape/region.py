@@ -27,6 +27,8 @@ class Region:
         self._cache_image: Image.Image | None = None
 
     def load(self, swf: SupercellSWF, tag: int):
+        assert swf.reader is not None
+
         self.texture_index = swf.reader.read_uchar()
 
         self._texture = swf.textures[self.texture_index]
@@ -82,6 +84,8 @@ class Region:
         # Note: it's 100% safe and very helpful for rendering movie clips
         if self._cache_image is not None:
             return self._cache_image
+
+        assert self._texture is not None and self._texture.image is not None
 
         rect = get_rect(self._uv_points)
 
