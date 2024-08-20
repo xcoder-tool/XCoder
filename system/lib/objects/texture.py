@@ -40,31 +40,34 @@ class SWFTexture:
         if not has_texture:
             return
 
+        khronos_texture_data = None
         if tag == 45:
             # noinspection PyUnboundLocalVariable
             khronos_texture_data = swf.reader.read(khronos_texture_length)
-            self.image = get_image_from_ktx_data(khronos_texture_data)
-            return
         elif tag == 47:
             with open(
                 swf.filepath.parent / self.khronos_texture_filename, "rb"
             ) as file:
                 decompressor = zstandard.ZstdDecompressor()
-                decompressed = decompressor.decompress(file.read())
-                self.image = get_image_from_ktx_data(decompressed)
+                khronos_texture_data = decompressor.decompress(file.read())
+
+        if khronos_texture_data is not None:
+            self.image = get_image_from_ktx_data(khronos_texture_data).resize(
+                (self.width, self.height), Image.Resampling.LANCZOS
+            )
             return
 
-        img = Image.new(
+        image = Image.new(
             get_format_by_pixel_type(self.pixel_type), (self.width, self.height)
         )
 
-        load_texture(swf.reader, self.pixel_type, img)
+        load_texture(swf.reader, self.pixel_type, image)
 
         if tag in (27, 28, 29):
-            join_image(img)
+            join_image(image)
         else:
-            load_image_from_buffer(img)
+            load_image_from_buffer(image)
 
         os.remove("pixel_buffer")
 
-        self.image = img
+        self.image = image

@@ -3,11 +3,12 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Tuple
 
 from loguru import logger
+from sc_compression import Signatures
 
 from system.bytestream import Reader
+from system.lib.math.point import Point
 from system.localization import locale
 
 
@@ -15,7 +16,7 @@ from system.localization import locale
 class SheetInfo:
     file_type: int
     pixel_type: int
-    size: Tuple[int, int]
+    size: tuple[int, int]
 
     @property
     def width(self) -> int:
@@ -29,9 +30,7 @@ class SheetInfo:
 @dataclass
 class RegionInfo:
     texture_id: int
-    points: list[tuple[int, int]]
-    is_mirrored: bool
-    rotation: int
+    points: list[Point]
 
 
 @dataclass
@@ -43,7 +42,8 @@ class ShapeInfo:
 @dataclass
 class FileInfo:
     name: str
-    use_lzham: bool
+    signature: Signatures
+    signature_version: int | None
     sheets: list[SheetInfo]
     shapes: list[ShapeInfo]
 
@@ -57,7 +57,9 @@ def parse_info(metadata_file_path: Path, has_detailed_info: bool) -> FileInfo:
 
     ensure_magic_known(reader)
 
-    file_info = FileInfo(os.path.splitext(metadata_file_path.name)[0], False, [], [])
+    file_info = FileInfo(
+        os.path.splitext(metadata_file_path.name)[0], Signatures.NONE, None, [], []
+    )
     parse_base_info(file_info, reader)
 
     if has_detailed_info:
@@ -67,8 +69,9 @@ def parse_info(metadata_file_path: Path, has_detailed_info: bool) -> FileInfo:
 
 
 def parse_base_info(file_info: FileInfo, reader: Reader) -> None:
-    use_lzham = reader.read_uchar() == 1
-    file_info.use_lzham = use_lzham
+    file_info.signature = Signatures.SC
+    file_info.signature_version = 1 if reader.read_string() == "LZMA" else 3
+
     sheets_count = reader.read_uchar()
     for i in range(sheets_count):
         file_type = reader.read_uchar()
@@ -91,13 +94,11 @@ def parse_detailed_info(file_info: FileInfo, reader: Reader) -> None:
             texture_id, points_count = reader.read_uchar(), reader.read_uchar()
 
             points = [
-                (reader.read_ushort(), reader.read_ushort())
+                Point(reader.read_ushort(), reader.read_ushort())
                 for _ in range(points_count)
             ]
 
-            is_mirrored, rotation = reader.read_uchar() == 1, reader.read_char() * 90
-
-            regions.append(RegionInfo(texture_id, points, is_mirrored, rotation))
+            regions.append(RegionInfo(texture_id, points))
 
         file_info.shapes.append(ShapeInfo(shape_id, regions))
 

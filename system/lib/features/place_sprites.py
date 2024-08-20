@@ -1,12 +1,11 @@
 import os
 from pathlib import Path
-from typing import List
 
-from PIL import Image, ImageDraw
+from PIL import Image
 
-from system.lib import Console
-from system.lib.helper import get_sides, get_size
-from system.lib.images import get_format_by_pixel_type
+from system.lib.console import Console
+from system.lib.images import create_filled_polygon_image, get_format_by_pixel_type
+from system.lib.math.polygon import get_rect
 from system.lib.xcod import FileInfo
 from system.localization import locale
 
@@ -15,7 +14,7 @@ MASK_COLOR = 255
 
 def place_sprites(
     file_info: FileInfo, folder: Path, overwrite: bool = False
-) -> List[Image.Image]:
+) -> list[Image.Image]:
     files_to_overwrite = os.listdir(folder / ("overwrite" if overwrite else ""))
     texture_files = os.listdir(folder / "textures")
 
@@ -40,59 +39,53 @@ def place_sprites(
         )
 
         for region_index, region_info in enumerate(shape_info.regions):
-            texture_size = (
-                sheets[region_info.texture_id].width,
-                sheets[region_info.texture_id].height,
-            )
+            texture_width = sheets[region_info.texture_id].width
+            texture_height = sheets[region_info.texture_id].height
 
             filename = f"shape_{shape_info.id}_{region_index}.png"
             if filename not in files_to_overwrite:
                 continue
 
-            img_mask = Image.new("L", texture_size, 0)
-            ImageDraw.Draw(img_mask).polygon(region_info.points, fill=MASK_COLOR)
-            bbox = img_mask.getbbox()
+            rect = get_rect(region_info.points)
 
-            if not bbox:
-                min_x = min(i[0] for i in region_info.points)
-                min_y = min(i[1] for i in region_info.points)
-                max_x = max(i[0] for i in region_info.points)
-                max_y = max(i[1] for i in region_info.points)
+            img_mask = create_filled_polygon_image(
+                "L", texture_width, texture_height, region_info.points, MASK_COLOR
+            )
 
-                if max_y - min_y != 0:
-                    for _y in range(max_y - min_y):
-                        img_mask.putpixel((max_x - 1, min_y + _y - 1), MASK_COLOR)
-
-                elif max_x - min_x != 0:
-                    for _x in range(max_x - min_x):
-                        img_mask.putpixel((min_x + _x - 1, max_y - 1), MASK_COLOR)
+            if rect.width == 0 or rect.height == 0:
+                if rect.height != 0:
+                    for _y in range(int(rect.height)):
+                        img_mask.putpixel(
+                            (int(rect.right - 1), int(rect.top + _y - 1)), MASK_COLOR
+                        )
+                    rect.right += 1
+                elif rect.width != 0:
+                    for _x in range(int(rect.width)):
+                        img_mask.putpixel(
+                            (int(rect.left + _x - 1), int(rect.bottom - 1)), MASK_COLOR
+                        )
+                    rect.bottom += 1
                 else:
-                    img_mask.putpixel((max_x - 1, max_y - 1), MASK_COLOR)
+                    img_mask.putpixel(
+                        (int(rect.right - 1), int(rect.bottom - 1)), MASK_COLOR
+                    )
+                    rect.right += 1
+                    rect.bottom += 1
 
-            left, top, right, bottom = get_sides(region_info.points)
-            if left == right:
-                right += 1
-            if top == bottom:
-                bottom += 1
+            x = int(rect.left)
+            y = int(rect.top)
+            width = int(rect.width)
+            height = int(rect.height)
+            bbox = int(rect.left), int(rect.top), int(rect.right), int(rect.bottom)
 
-            width, height = get_size(left, top, right, bottom)
-            left = int(left)
-            top = int(top)
-
-            bbox = int(left), int(top), int(right), int(bottom)
-
-            tmp_region = Image.open(
+            region_image = Image.open(
                 f'{folder}{"/overwrite" if overwrite else ""}/{filename}'
             ).convert("RGBA")
-            if region_info.is_mirrored:
-                tmp_region = tmp_region.transpose(Image.Transpose.FLIP_LEFT_RIGHT)
-            tmp_region = tmp_region.rotate(region_info.rotation, expand=True)
-            tmp_region = tmp_region.resize((width, height), Image.Resampling.LANCZOS)
 
             sheets[region_info.texture_id].paste(
-                Image.new("RGBA", (width, height)), (left, top), img_mask.crop(bbox)
+                Image.new("RGBA", (width, height)), (x, y), img_mask.crop(bbox)
             )
-            sheets[region_info.texture_id].paste(tmp_region, (left, top), tmp_region)
+            sheets[region_info.texture_id].paste(region_image, (x, y), region_image)
     print()
 
     return sheets

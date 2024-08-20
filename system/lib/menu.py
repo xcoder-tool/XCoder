@@ -113,6 +113,3 @@ class Menu:
     @staticmethod
     def _print_divider_line(console_width: int) -> None:
         print((console_width - 1) * "-")
-
-
-menu = Menu()

@@ -1,6 +1,8 @@
 import json
 import os
 
+from system.lib.config import config
+
 DEFAULT_STRING = "NO LOCALE"
 
 
@@ -76,7 +78,6 @@ class Locale:
         self.resizing: str = DEFAULT_STRING
         self.split_pic: str = DEFAULT_STRING
         self.writing_pic: str = DEFAULT_STRING
-        self.header_done: str = DEFAULT_STRING
         self.compressing_with: str = DEFAULT_STRING
         self.compression_error: str = DEFAULT_STRING
         self.compression_done: str = DEFAULT_STRING
@@ -144,3 +145,4 @@ class Locale:
 
 
 locale = Locale()
+locale.load(config.language)

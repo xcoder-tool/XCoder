@@ -1,10 +1,12 @@
 import math
 
 import PIL.PyAccess
-from PIL import Image
+from PIL import Image, ImageDraw
 
 from system.bytestream import Reader, Writer
 from system.lib.console import Console
+from system.lib.math.point import Point
+from system.lib.matrices import Matrix2x3
 from system.lib.pixel_utils import (
     get_channel_count_by_pixel_type,
     get_read_function,
@@ -17,20 +19,19 @@ CHUNK_SIZE = 32
 
 def load_image_from_buffer(img: Image.Image) -> None:
     width, height = img.size
-    # noinspection PyTypeChecker
     img_loaded: PIL.PyAccess.PyAccess = img.load()  # type: ignore
 
     with open("pixel_buffer", "rb") as pixel_buffer:
-        channels_count = int.from_bytes(pixel_buffer.read(1), "little")
+        channel_count = int.from_bytes(pixel_buffer.read(1), "little")
 
         for y in range(height):
             for x in range(width):
-                img_loaded[x, y] = tuple(pixel_buffer.read(channels_count))
+                img_loaded[x, y] = tuple(pixel_buffer.read(channel_count))
 
 
 def join_image(img: Image.Image) -> None:
     with open("pixel_buffer", "rb") as pixel_buffer:
-        channels_count = int.from_bytes(pixel_buffer.read(1), "little")
+        channel_count = int.from_bytes(pixel_buffer.read(1), "little")
 
         width, height = img.size
         # noinspection PyTypeChecker
@@ -52,14 +53,14 @@ def join_image(img: Image.Image) -> None:
                             break
 
                         loaded_img[pixel_x, pixel_y] = tuple(
-                            pixel_buffer.read(channels_count)
+                            pixel_buffer.read(channel_count)
                         )
 
             Console.progress_bar(locale.join_pic, y_chunk, y_chunks_count + 1)
 
 
-def split_image(img: Image.Image):
-    def add_pixel(pixel: tuple):
+def split_image(img: Image.Image) -> None:
+    def add_pixel(pixel: tuple) -> None:
         loaded_image[pixel_index % width, int(pixel_index / width)] = pixel
 
     width, height = img.size
@@ -122,7 +123,6 @@ def load_texture(reader: Reader, pixel_type: int, img: Image.Image) -> None:
 
     with open("pixel_buffer", "wb") as pixel_buffer:
         pixel_buffer.write(channel_count.to_bytes(1, "little"))
-        print()
 
         width, height = img.size
         point = -1
@@ -138,14 +138,14 @@ def load_texture(reader: Reader, pixel_type: int, img: Image.Image) -> None:
                 point = curr
 
 
-def save_texture(writer: Writer, img: Image.Image, pixel_type: int):
+def save_texture(writer: Writer, image: Image.Image, pixel_type: int) -> None:
     write_pixel = get_write_function(pixel_type)
     if write_pixel is None:
         raise Exception(locale.unknown_pixel_type % pixel_type)
 
-    width, height = img.size
+    width, height = image.size
 
-    pixels = img.getdata()
+    pixels = image.getdata()
     point = -1
     for y in range(height):
         for x in range(width):
@@ -157,7 +157,9 @@ def save_texture(writer: Writer, img: Image.Image, pixel_type: int):
             point = curr
 
 
-def transform_image(image, scale_x, scale_y, angle, x, y):
+def transform_image(
+    image: Image.Image, scale_x: float, scale_y: float, angle: float, x: float, y: float
+) -> Image.Image:
     im_orig = image
     image = Image.new("RGBA", im_orig.size, (255, 255, 255, 255))
     image.paste(im_orig)
@@ -198,13 +200,13 @@ def transform_image(image, scale_x, scale_y, angle, x, y):
 
     return image.transform(
         (translated_w, translated_h),
-        Image.AFFINE,
+        Image.Transform.AFFINE,
         (a, b, c, d, e, f),
-        resample=Image.BILINEAR,
+        resample=Image.Resampling.BILINEAR,
     )
 
 
-def translate_image(image, x, y):
+def translate_image(image, x: float, y: float) -> Image.Image:
     w, h = image.size
 
     translated_w = int(math.ceil(w + math.fabs(x)))
@@ -216,23 +218,29 @@ def translate_image(image, x, y):
 
     return image.transform(
         (translated_w, translated_h),
-        Image.AFFINE,
+        Image.Transform.AFFINE,
         (1, 0, -x, 0, 1, -y),
-        resample=Image.BILINEAR,
+        resample=Image.Resampling.BILINEAR,
     )
 
 
-def transform_image_by_matrix(image, matrix: list or tuple):
-    scale_x, rotation_x, x = matrix[:3]
-    rotation_y, scale_y, y = matrix[3:]
-    return transform_image(
-        image, scale_x, scale_y, math.atan2(rotation_x, rotation_y), x, y
+def transform_image_by_matrix(image: Image.Image, matrix: Matrix2x3):
+    new_width = abs(int(matrix.apply_x(image.width, image.height)))
+    new_height = abs(int(matrix.apply_y(image.width, image.height)))
+
+    return image.transform(
+        (new_width, new_height),
+        Image.Transform.AFFINE,
+        (matrix.a, matrix.b, matrix.x, matrix.c, matrix.d, matrix.y),
+        resample=Image.Resampling.BILINEAR,
     )
 
 
-if __name__ == "__main__":
-    transform_image_by_matrix(
-        Image.open("../../test_0.png"),
-        [1.0458984375, 0.0, -127.65, 0.0, 1.0458984375, -700.0],
-    ).show()
-    input()
+def create_filled_polygon_image(
+    mode: str, width: int, height: int, polygon: list[Point], color: int
+) -> Image.Image:
+    mask_image = Image.new(mode, (width, height), 0)
+    drawable_image = ImageDraw.Draw(mask_image)
+    drawable_image.polygon([point.as_tuple() for point in polygon], fill=color)
+
+    return mask_image
