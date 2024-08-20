@@ -1,3 +1,4 @@
+from math import atan2, cos, degrees, hypot, sin
 from typing import Self
 
 from system.bytestream import Reader
@@ -67,3 +68,23 @@ class Matrix2x3:
         self.y = y
 
         return self
+
+    def get_angle_radians(self) -> float:
+        theta = atan2(self.b, self.a)
+        return theta
+
+    def get_angle(self) -> float:
+        return degrees(self.get_angle_radians())
+
+    def get_scale(self) -> tuple[float, float]:
+        scale_x = hypot(self.a, self.b)
+
+        theta = self.get_angle_radians()
+        sin_theta = sin(theta)
+
+        scale_y = self.d / cos(theta) if abs(sin_theta) <= 0.01 else self.c / sin_theta
+
+        return scale_x, scale_y
+
+    def __str__(self):
+        return f"Matrix2x3{self.a, self.b, self.c, self.d, self.x, self.y}"

@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 from PIL import Image
 
 from system.lib.math.rect import Rect
-from system.lib.matrices import Matrix2x3, MatrixBank
+from system.lib.matrices import ColorTransform, Matrix2x3, MatrixBank
 from system.lib.objects.movie_clip.movie_clip import MovieClip
 from system.lib.objects.movie_clip.movie_clip_frame import MovieClipFrame
 from system.lib.objects.renderable.display_object import DisplayObject
@@ -57,26 +57,29 @@ class RenderableMovieClip(DisplayObject):
         matrix_multiplied = Matrix2x3(self._matrix)
         matrix_multiplied.multiply(matrix)
 
-        bounds = self.calculate_bounds(matrix_multiplied)
+        bounds = self.calculate_bounds(matrix)
 
         image = Image.new("RGBA", (int(bounds.width), int(bounds.height)))
 
         for child in self._frame_children:
-            rendered_region = child.render(matrix_multiplied)
-            region_bounds = child.calculate_bounds(matrix_multiplied)
+            rendered_child = child.render(matrix_multiplied)
+            child_bounds = child.calculate_bounds(matrix_multiplied)
 
-            x = int(region_bounds.left - bounds.left)
-            y = int(region_bounds.top - bounds.top)
+            x = int(child_bounds.left - bounds.left)
+            y = int(child_bounds.top - bounds.top)
 
-            image.paste(rendered_region, (x, y), rendered_region)
+            image.paste(rendered_child, (x, y), rendered_child)
 
         return image
 
-    def calculate_bounds(self, matrix: Matrix2x3 | None = None) -> Rect:
+    def calculate_bounds(self, matrix: Matrix2x3) -> Rect:
+        matrix_multiplied = Matrix2x3(self._matrix)
+        matrix_multiplied.multiply(matrix)
+
         rect = Rect()
 
         for child in self._frame_children:
-            rect.merge_bounds(child.calculate_bounds(matrix))
+            rect.merge_bounds(child.calculate_bounds(matrix_multiplied))
 
         return rect
 
@@ -85,11 +88,11 @@ class RenderableMovieClip(DisplayObject):
 
         frame = self._frames[frame_index]
         for child_index, matrix_index, color_transform_index in frame.get_elements():
-            matrix = None
+            matrix = Matrix2x3()
             if matrix_index != 0xFFFF:
                 matrix = self._matrix_bank.get_matrix(matrix_index)
 
-            color_transform = None
+            color_transform = ColorTransform()
             if color_transform_index != 0xFFFF:
                 color_transform = self._matrix_bank.get_color_transform(
                     color_transform_index

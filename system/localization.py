@@ -1,6 +1,8 @@
 import json
 import os
 
+from system.lib.config import config
+
 DEFAULT_STRING = "NO LOCALE"
 
 
@@ -144,3 +146,4 @@ class Locale:
 
 
 locale = Locale()
+locale.load(config.language)

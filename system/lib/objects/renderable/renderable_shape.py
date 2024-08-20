@@ -19,7 +19,7 @@ class RenderableShape(DisplayObject):
         matrix_multiplied = Matrix2x3(self._matrix)
         matrix_multiplied.multiply(matrix)
 
-        bounds = self.calculate_bounds(matrix_multiplied)
+        bounds = self.calculate_bounds(matrix)
 
         image = Image.new("RGBA", (int(bounds.width), int(bounds.height)))
 
@@ -34,10 +34,13 @@ class RenderableShape(DisplayObject):
 
         return image
 
-    def calculate_bounds(self, matrix: Matrix2x3 | None = None) -> Rect:
+    def calculate_bounds(self, matrix: Matrix2x3) -> Rect:
+        matrix_multiplied = Matrix2x3(self._matrix)
+        matrix_multiplied.multiply(matrix)
+
         rect = Rect()
 
         for region in self._regions:
-            rect.merge_bounds(region.calculate_bounds(matrix))
+            rect.merge_bounds(region.calculate_bounds(matrix_multiplied))
 
         return rect

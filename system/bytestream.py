@@ -37,7 +37,7 @@ class Reader(io.BytesIO):
 
     def read_string(self) -> str:
         length = self.read_uchar()
-        if length != 255:
+        if length != 0xFF:
             return self.read(length).decode()
         return ""
 
@@ -70,7 +70,7 @@ class Writer(io.BytesIO):
 
     def write_string(self, string: str | None = None):
         if string is None:
-            self.write_byte(255)
+            self.write_byte(0xFF)
             return
         encoded = string.encode()
         self.write_byte(len(encoded))

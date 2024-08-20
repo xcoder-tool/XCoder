@@ -3,7 +3,7 @@ from pathlib import Path
 
 from PIL import Image
 
-from system.lib import Console
+from system.lib.console import Console
 from system.lib.images import create_filled_polygon_image, get_format_by_pixel_type
 from system.lib.math.polygon import get_rect
 from system.lib.xcod import FileInfo

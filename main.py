@@ -1,6 +1,13 @@
-# Refactored by Vorono4ka
-
 import time
+
+from system.lib.config import config
+from system.lib.main_menu import (
+    check_auto_update,
+    check_files_updated,
+    menu,
+    refill_menu,
+)
+from system.localization import locale
 
 try:
     from loguru import logger
@@ -8,14 +15,6 @@ except ImportError:
     raise RuntimeError("Please, install loguru using pip")
 
 from system import clear
-from system.lib import (
-    config,
-    locale,
-    refill_menu,
-    menu,
-    check_auto_update,
-    check_files_updated,
-)
 from system.lib.features.initialization import initialize
 
 
@@ -50,4 +49,3 @@ if __name__ == "__main__":
         main()
     except KeyboardInterrupt:
         logger.info("Exit.")
-        pass

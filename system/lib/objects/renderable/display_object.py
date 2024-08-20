@@ -14,7 +14,7 @@ class DisplayObject(ABC):
         self._color_transform = ColorTransform()
 
     @abstractmethod
-    def calculate_bounds(self, matrix: Matrix2x3 | None = None) -> Rect:
+    def calculate_bounds(self, matrix: Matrix2x3) -> Rect:
         ...
 
     @abstractmethod

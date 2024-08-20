@@ -8,6 +8,16 @@ class Point:
             return self.x == other.x and self.y == other.y
         return False
 
+    def __mul__(self, other):
+        if isinstance(other, int):
+            self.x *= other
+            self.y *= other
+        if isinstance(other, float):
+            self.x *= other
+            self.y *= other
+
+        return self
+
     def __add__(self, other):
         if isinstance(other, Point):
             self.x += other.x

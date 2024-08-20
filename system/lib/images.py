@@ -22,16 +22,16 @@ def load_image_from_buffer(img: Image.Image) -> None:
     img_loaded: PIL.PyAccess.PyAccess = img.load()  # type: ignore
 
     with open("pixel_buffer", "rb") as pixel_buffer:
-        channels_count = int.from_bytes(pixel_buffer.read(1), "little")
+        channel_count = int.from_bytes(pixel_buffer.read(1), "little")
 
         for y in range(height):
             for x in range(width):
-                img_loaded[x, y] = tuple(pixel_buffer.read(channels_count))
+                img_loaded[x, y] = tuple(pixel_buffer.read(channel_count))
 
 
 def join_image(img: Image.Image) -> None:
     with open("pixel_buffer", "rb") as pixel_buffer:
-        channels_count = int.from_bytes(pixel_buffer.read(1), "little")
+        channel_count = int.from_bytes(pixel_buffer.read(1), "little")
 
         width, height = img.size
         # noinspection PyTypeChecker
@@ -53,14 +53,14 @@ def join_image(img: Image.Image) -> None:
                             break
 
                         loaded_img[pixel_x, pixel_y] = tuple(
-                            pixel_buffer.read(channels_count)
+                            pixel_buffer.read(channel_count)
                         )
 
             Console.progress_bar(locale.join_pic, y_chunk, y_chunks_count + 1)
 
 
-def split_image(img: Image.Image):
-    def add_pixel(pixel: tuple):
+def split_image(img: Image.Image) -> None:
+    def add_pixel(pixel: tuple) -> None:
         loaded_image[pixel_index % width, int(pixel_index / width)] = pixel
 
     width, height = img.size
@@ -139,14 +139,14 @@ def load_texture(reader: Reader, pixel_type: int, img: Image.Image) -> None:
                 point = curr
 
 
-def save_texture(writer: Writer, img: Image.Image, pixel_type: int):
+def save_texture(writer: Writer, image: Image.Image, pixel_type: int) -> None:
     write_pixel = get_write_function(pixel_type)
     if write_pixel is None:
         raise Exception(locale.unknown_pixel_type % pixel_type)
 
-    width, height = img.size
+    width, height = image.size
 
-    pixels = img.getdata()
+    pixels = image.getdata()
     point = -1
     for y in range(height):
         for x in range(width):
@@ -158,7 +158,9 @@ def save_texture(writer: Writer, img: Image.Image, pixel_type: int):
             point = curr
 
 
-def transform_image(image, scale_x, scale_y, angle, x, y):
+def transform_image(
+    image: Image.Image, scale_x: float, scale_y: float, angle: float, x: float, y: float
+) -> Image.Image:
     im_orig = image
     image = Image.new("RGBA", im_orig.size, (255, 255, 255, 255))
     image.paste(im_orig)
@@ -224,8 +226,8 @@ def translate_image(image, x: float, y: float) -> Image.Image:
 
 
 def transform_image_by_matrix(image: Image.Image, matrix: Matrix2x3):
-    new_width = matrix.apply_x(image.width, image.height)
-    new_height = matrix.apply_y(image.width, image.height)
+    new_width = abs(int(matrix.apply_x(image.width, image.height)))
+    new_height = abs(int(matrix.apply_y(image.width, image.height)))
 
     return image.transform(
         (new_width, new_height),
