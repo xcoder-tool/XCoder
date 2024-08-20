@@ -123,7 +123,6 @@ def load_texture(reader: Reader, pixel_type: int, img: Image.Image) -> None:
 
     with open("pixel_buffer", "wb") as pixel_buffer:
         pixel_buffer.write(channel_count.to_bytes(1, "little"))
-        print()
 
         width, height = img.size
         point = -1

@@ -132,7 +132,3 @@ class Region:
 
     def calculate_bounds(self, matrix: Matrix2x3 | None = None) -> Rect:
         return get_rect(apply_matrix(self._xy_points, matrix))
-
-    @property
-    def xy_points(self):
-        return self._xy_points

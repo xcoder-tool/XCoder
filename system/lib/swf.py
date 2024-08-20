@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 
 from loguru import logger
+from sc_compression import Signatures
 
 from system.bytestream import Reader, Writer
 from system.lib.features.files import open_sc
@@ -53,32 +54,37 @@ class SupercellSWF:
         self._matrix_banks: list[MatrixBank] = []
         self._matrix_bank: MatrixBank | None = None
 
-    def load(self, filepath: str | os.PathLike) -> tuple[bool, bool]:
+    def load(self, filepath: str | os.PathLike) -> tuple[bool, Signatures]:
         self._filepath = Path(filepath)
 
-        texture_loaded, use_lzham = self._load_internal(
+        texture_loaded, signature = self._load_internal(
             self._filepath, self._filepath.name.endswith("_tex.sc")
         )
 
         if not texture_loaded:
             if self._use_uncommon_texture:
-                texture_loaded, use_lzham = self._load_internal(
+                texture_loaded, signature = self._load_internal(
                     self._uncommon_texture_path, True
                 )
             else:
                 texture_path = str(self._filepath)[:-3] + SupercellSWF.TEXTURE_EXTENSION
-                texture_loaded, use_lzham = self._load_internal(texture_path, True)
+                texture_loaded, signature = self._load_internal(texture_path, True)
 
-        return texture_loaded, use_lzham
+        return texture_loaded, signature
 
     def _load_internal(
         self, filepath: str | os.PathLike, is_texture_file: bool
-    ) -> tuple[bool, bool]:
+    ) -> tuple[bool, Signatures]:
         self.filename = os.path.basename(filepath)
 
         logger.info(locale.collecting_inf % self.filename)
 
-        decompressed_data, use_lzham = open_sc(filepath)
+        decompressed_data, signature = open_sc(filepath)
+
+        if signature.name != Signatures.NONE:
+            logger.info(locale.detected_comp % signature.name.upper())
+        print()
+
         self.reader = Reader(decompressed_data)
         del decompressed_data
 
@@ -127,7 +133,7 @@ class SupercellSWF:
             if isinstance(movie_clip, MovieClip):
                 movie_clip.export_name = export_name
 
-        return loaded, use_lzham
+        return loaded, signature
 
     def _load_tags(self, is_texture_file: bool) -> bool:
         has_texture = True
@@ -163,6 +169,7 @@ class SupercellSWF:
                             texture.height,
                         )
                     )
+                    print()
 
                     self.xcod_writer.write_ubyte(tag)
                     self.xcod_writer.write_ubyte(texture.pixel_type)

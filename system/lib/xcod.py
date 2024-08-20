@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from loguru import logger
+from sc_compression import Signatures
 
 from system.bytestream import Reader
 from system.lib.math.point import Point
@@ -41,7 +42,8 @@ class ShapeInfo:
 @dataclass
 class FileInfo:
     name: str
-    use_lzham: bool
+    signature: Signatures
+    signature_version: int | None
     sheets: list[SheetInfo]
     shapes: list[ShapeInfo]
 
@@ -55,7 +57,9 @@ def parse_info(metadata_file_path: Path, has_detailed_info: bool) -> FileInfo:
 
     ensure_magic_known(reader)
 
-    file_info = FileInfo(os.path.splitext(metadata_file_path.name)[0], False, [], [])
+    file_info = FileInfo(
+        os.path.splitext(metadata_file_path.name)[0], Signatures.NONE, None, [], []
+    )
     parse_base_info(file_info, reader)
 
     if has_detailed_info:
@@ -65,8 +69,9 @@ def parse_info(metadata_file_path: Path, has_detailed_info: bool) -> FileInfo:
 
 
 def parse_base_info(file_info: FileInfo, reader: Reader) -> None:
-    use_lzham = reader.read_uchar() == 1
-    file_info.use_lzham = use_lzham
+    file_info.signature = Signatures.SC
+    file_info.signature_version = 1 if reader.read_string() == "LZMA" else 3
+
     sheets_count = reader.read_uchar()
     for i in range(sheets_count):
         file_type = reader.read_uchar()

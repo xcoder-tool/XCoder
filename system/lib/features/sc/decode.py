@@ -3,7 +3,9 @@ import shutil
 from pathlib import Path
 
 from loguru import logger
+from sc_compression import Signatures
 
+from system.bytestream import Writer
 from system.lib.features.cut_sprites import render_objects
 from system.lib.swf import SupercellSWF
 from system.localization import locale
@@ -25,7 +27,7 @@ def decode_textures_only():
         swf = SupercellSWF()
         base_name = os.path.basename(file).rsplit(".", 1)[0]
         try:
-            texture_loaded, use_lzham = swf.load(f"{input_folder / file}")
+            texture_loaded, signature = swf.load(f"{input_folder / file}")
             if not texture_loaded:
                 logger.error(locale.not_found % f"{base_name}_tex.sc")
                 continue
@@ -37,7 +39,7 @@ def decode_textures_only():
             )
 
             _save_meta_file(
-                swf, objects_output_folder, base_name.rstrip("_"), use_lzham
+                swf, objects_output_folder, base_name.rstrip("_"), signature
             )
             _save_textures(swf, objects_output_folder, base_name)
         except Exception as exception:
@@ -66,7 +68,7 @@ def decode_and_render_objects():
             base_name = os.path.basename(file).rsplit(".", 1)[0]
 
             swf = SupercellSWF()
-            texture_loaded, use_lzham = swf.load(input_folder / file)
+            texture_loaded, signature = swf.load(input_folder / file)
             if not texture_loaded:
                 logger.error(locale.not_found % f"{base_name}_tex.sc")
                 continue
@@ -79,7 +81,7 @@ def decode_and_render_objects():
 
             _save_textures(swf, objects_output_folder / "textures", base_name)
             render_objects(swf, objects_output_folder)
-            _save_meta_file(swf, objects_output_folder, base_name, use_lzham)
+            _save_meta_file(swf, objects_output_folder, base_name, signature)
         except Exception as exception:
             logger.exception(
                 locale.error
@@ -113,10 +115,16 @@ def _save_textures(swf: SupercellSWF, textures_output: Path, base_name: str) -> 
 
 
 def _save_meta_file(
-    swf: SupercellSWF, objects_output_folder: Path, base_name: str, use_lzham: bool
+    swf: SupercellSWF,
+    objects_output_folder: Path,
+    base_name: str,
+    signature: Signatures,
 ) -> None:
-    with open(objects_output_folder / f"{base_name}.xcod", "wb") as xcod_file:
-        xcod_file.write(b"XCOD")
-        xcod_file.write(bool.to_bytes(use_lzham, 1, "big"))
-        xcod_file.write(int.to_bytes(len(swf.textures), 1, "big"))
-        xcod_file.write(swf.xcod_writer.getvalue())
+    writer = Writer()
+    writer.write(b"XCOD")
+    writer.write_string(signature.name)
+    writer.write_ubyte(len(swf.textures))
+    writer.write(swf.xcod_writer.getvalue())
+
+    with open(objects_output_folder / f"{base_name}.xcod", "wb") as file:
+        file.write(writer.getvalue())

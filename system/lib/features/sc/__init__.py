@@ -55,4 +55,12 @@ def compile_sc(
 
     sc.write(bytes(5))
 
-    write_sc(output_folder / f"{file_info.name}.sc", sc.getvalue(), file_info.use_lzham)
+    logger.info(locale.compressing_with % file_info.signature.name.upper())
+    write_sc(
+        output_folder / f"{file_info.name}.sc",
+        sc.getvalue(),
+        file_info.signature,
+        file_info.signature_version,
+    )
+    logger.info(locale.compression_done)
+    print()

@@ -75,5 +75,3 @@ def render_objects(swf: SupercellSWF, output_folder: Path):
             movie_clip_index,
             movie_clip_count,
         )
-
-    print()

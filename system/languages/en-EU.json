@@ -70,7 +70,6 @@
     "resizing": "Resizing...",
     "split_pic": "Splitting picture...",
     "writing_pic": "Writing pixels...",
-    "header_done": "Header wrote!",
     "compressing_with": "Compressing texture with %s...",
     "compression_error": "Compression failed",
     "compression_done": "Compression done!",
