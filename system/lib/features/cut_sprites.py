@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 
+from system.lib.config import config
 from system.lib.console import Console
 from system.lib.matrices import Matrix2x3
 from system.lib.objects.renderable.renderable_factory import (
@@ -53,25 +54,26 @@ def render_objects(swf: SupercellSWF, output_folder: Path):
             rendered_region = region.get_image()
             rendered_region.save(f"{output_folder}/shape_{shape.id}_{region_index}.png")
 
-    movie_clips_skipped = 0
-    movie_clip_count = len(swf.movie_clips)
-    for movie_clip_index in range(movie_clip_count):
-        movie_clip = swf.movie_clips[movie_clip_index]
+    if config.should_render_movie_clips:
+        movie_clips_skipped = 0
+        movie_clip_count = len(swf.movie_clips)
+        for movie_clip_index in range(movie_clip_count):
+            movie_clip = swf.movie_clips[movie_clip_index]
 
-        rendered_movie_clip = create_renderable_from_plain(swf, movie_clip).render(
-            Matrix2x3()
-        )
-        if sum(rendered_movie_clip.size) >= 2:
-            clip_name = movie_clip.export_name or movie_clip.id
-            rendered_movie_clip.save(f"{output_folder}/movie_clips/{clip_name}.png")
-        else:
-            # For debug:
-            # logger.warning(f'MovieClip {movie_clip.id} cannot be rendered.')
-            movie_clips_skipped += 1
+            rendered_movie_clip = create_renderable_from_plain(swf, movie_clip).render(
+                Matrix2x3()
+            )
+            if sum(rendered_movie_clip.size) >= 2:
+                clip_name = movie_clip.export_name or movie_clip.id
+                rendered_movie_clip.save(f"{output_folder}/movie_clips/{clip_name}.png")
+            else:
+                # For debug:
+                # logger.warning(f'MovieClip {movie_clip.id} cannot be rendered.')
+                movie_clips_skipped += 1
 
-        Console.progress_bar(
-            "Rendering movie clips (%d/%d). Skipped count: %d"
-            % (movie_clip_index + 1, movie_clip_count, movie_clips_skipped),
-            movie_clip_index,
-            movie_clip_count,
-        )
+            Console.progress_bar(
+                "Rendering movie clips (%d/%d). Skipped count: %d"
+                % (movie_clip_index + 1, movie_clip_count, movie_clips_skipped),
+                movie_clip_index,
+                movie_clip_count,
+            )

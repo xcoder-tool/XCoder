@@ -16,6 +16,7 @@ class Config:
             "has_update",
             "last_update",
             "auto_update",
+            "should_render_movie_clips",
         )
 
         self.initialized: bool = False
@@ -24,6 +25,7 @@ class Config:
         self.has_update: bool = False
         self.last_update: int = -1
         self.auto_update: bool = False
+        self.should_render_movie_clips: bool = False
 
         self.load()
 
