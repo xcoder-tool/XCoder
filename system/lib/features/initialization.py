@@ -3,7 +3,7 @@ import platform
 from loguru import logger
 
 from system import clear, run
-from system.lib import config
+from system.lib.config import config
 from system.lib.features.directories import create_directories
 from system.lib.features.update.check import get_pip_info, get_tags
 from system.localization import locale

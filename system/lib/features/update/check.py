@@ -4,7 +4,7 @@ import os
 from loguru import logger
 
 from system import run
-from system.lib import config
+from system.lib.config import config
 from system.lib.features.update.download import download_update
 from system.localization import locale
 

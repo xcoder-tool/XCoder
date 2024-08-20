@@ -84,6 +84,8 @@ class RenderableMovieClip(DisplayObject):
         return rect
 
     def set_frame(self, frame_index: int):
+        assert self._matrix_bank is not None
+
         self._frame_children = []
 
         frame = self._frames[frame_index]

@@ -14,7 +14,7 @@ class PointOrder(IntEnum):
     COUNTER_CLOCKWISE = 1
 
 
-def get_polygon_sum_of_edges(polygon: Polygon) -> int:
+def get_polygon_sum_of_edges(polygon: Polygon) -> float:
     """
      Mostly like signed area, but two times bigger and more accurate with signs.
 

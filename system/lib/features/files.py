@@ -8,16 +8,16 @@ from system.localization import locale
 
 
 def write_sc(
-    output_filename: str | os.PathLike,
+    output_filename: os.PathLike | str,
     buffer: bytes,
     signature: Signatures,
     version: int | None = None,
 ):
     with open(output_filename, "wb") as file_out:
-        file_out.write(compress(buffer, signature, version))
+        file_out.write(compress(buffer, signature, version))  # type: ignore
 
 
-def open_sc(input_filename: str) -> tuple[bytes, Signatures]:
+def open_sc(input_filename: os.PathLike | str) -> tuple[bytes, Signatures]:
     with open(input_filename, "rb") as f:
         file_data = f.read()
 

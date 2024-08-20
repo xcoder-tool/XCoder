@@ -17,6 +17,8 @@ class Shape(PlainObject):
         self.regions: list[Region] = []
 
     def load(self, swf: SupercellSWF, tag: int):
+        assert swf.reader is not None
+
         self.id = swf.reader.read_ushort()
 
         swf.reader.read_ushort()  # regions_count

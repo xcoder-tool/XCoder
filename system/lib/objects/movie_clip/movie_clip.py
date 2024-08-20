@@ -27,6 +27,8 @@ class MovieClip(PlainObject):
         self.matrix_bank_index: int = 0
 
     def load(self, swf: SupercellSWF, tag: int):
+        assert swf.reader is not None
+
         self.id = swf.reader.read_ushort()
 
         self.fps = swf.reader.read_char()

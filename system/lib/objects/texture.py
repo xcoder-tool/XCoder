@@ -24,15 +24,18 @@ class SWFTexture:
         self.height = 0
 
         self.pixel_type = -1
-        self.khronos_texture_filename: str | None = None
 
         self.image: Image.Image | None = None
 
     def load(self, swf: SupercellSWF, tag: int, has_texture: bool):
+        assert swf.reader is not None
+
+        khronos_texture_length = 0
+        khronos_texture_filename = None
         if tag == 45:
             khronos_texture_length = swf.reader.read_int()
         elif tag == 47:
-            self.khronos_texture_filename = swf.reader.read_string()
+            khronos_texture_filename = swf.reader.read_string()
 
         self.pixel_type = swf.reader.read_char()
         self.width, self.height = (swf.reader.read_ushort(), swf.reader.read_ushort())
@@ -45,9 +48,8 @@ class SWFTexture:
             # noinspection PyUnboundLocalVariable
             khronos_texture_data = swf.reader.read(khronos_texture_length)
         elif tag == 47:
-            with open(
-                swf.filepath.parent / self.khronos_texture_filename, "rb"
-            ) as file:
+            assert khronos_texture_filename is not None
+            with open(swf.filepath.parent / khronos_texture_filename, "rb") as file:
                 decompressor = zstandard.ZstdDecompressor()
                 khronos_texture_data = decompressor.decompress(file.read())
 

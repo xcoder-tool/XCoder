@@ -39,7 +39,7 @@ def decode_textures_only():
             )
 
             _save_meta_file(
-                swf, objects_output_folder, base_name.rstrip("_"), signature
+                swf, objects_output_folder, base_name.rsplit("_", 1)[0], signature
             )
             _save_textures(swf, objects_output_folder, base_name)
         except Exception as exception:
@@ -96,6 +96,7 @@ def decode_and_render_objects():
 
 
 def get_file_basename(swf: SupercellSWF):
+    assert swf.filename is not None
     return os.path.basename(swf.filename).rsplit(".", 1)[0]
 
 
@@ -109,9 +110,9 @@ def _create_objects_output_folder(output_folder: Path, base_name: str) -> Path:
 
 def _save_textures(swf: SupercellSWF, textures_output: Path, base_name: str) -> None:
     os.makedirs(textures_output, exist_ok=True)
-    for img_index in range(len(swf.textures)):
-        filename = base_name + "_" * img_index
-        swf.textures[img_index].image.save(textures_output / f"{filename}.png")
+    for texture_index, texture in enumerate(swf.textures):
+        assert texture.image is not None
+        texture.image.save(textures_output / f"{base_name}_{texture_index}.png")
 
 
 def _save_meta_file(
