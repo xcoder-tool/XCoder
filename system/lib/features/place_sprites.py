@@ -52,21 +52,25 @@ def place_sprites(
                 "L", texture_width, texture_height, region_info.points, MASK_COLOR
             )
 
-            if rect.width + rect.height <= 2:
+            if rect.width == 0 or rect.height == 0:
                 if rect.height != 0:
                     for _y in range(int(rect.height)):
                         img_mask.putpixel(
                             (int(rect.right - 1), int(rect.top + _y - 1)), MASK_COLOR
                         )
+                    rect.right += 1
                 elif rect.width != 0:
                     for _x in range(int(rect.width)):
                         img_mask.putpixel(
                             (int(rect.left + _x - 1), int(rect.bottom - 1)), MASK_COLOR
                         )
+                    rect.bottom += 1
                 else:
                     img_mask.putpixel(
                         (int(rect.right - 1), int(rect.bottom - 1)), MASK_COLOR
                     )
+                    rect.right += 1
+                    rect.bottom += 1
 
             x = int(rect.left)
             y = int(rect.top)
@@ -74,18 +78,14 @@ def place_sprites(
             height = int(rect.height)
             bbox = int(rect.left), int(rect.top), int(rect.right), int(rect.bottom)
 
-            tmp_region = Image.open(
+            region_image = Image.open(
                 f'{folder}{"/overwrite" if overwrite else ""}/{filename}'
             ).convert("RGBA")
-            if region_info.is_mirrored:
-                tmp_region = tmp_region.transpose(Image.Transpose.FLIP_LEFT_RIGHT)
-            tmp_region = tmp_region.rotate(region_info.rotation, expand=True)
-            tmp_region = tmp_region.resize((width, height), Image.Resampling.LANCZOS)
 
             sheets[region_info.texture_id].paste(
                 Image.new("RGBA", (width, height)), (x, y), img_mask.crop(bbox)
             )
-            sheets[region_info.texture_id].paste(tmp_region, (x, y), tmp_region)
+            sheets[region_info.texture_id].paste(region_image, (x, y), region_image)
     print()
 
     return sheets

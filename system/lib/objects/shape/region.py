@@ -17,9 +17,7 @@ if TYPE_CHECKING:
 
 class Region:
     def __init__(self):
-        self.texture_index = 0
-        self.rotation = 0
-        self.is_mirrored = False
+        self.texture_index: int = 0
 
         self._point_count = 0
         self._xy_points: list[Point] = []
@@ -52,17 +50,13 @@ class Region:
 
             self._uv_points[i] = Point(u, v)
 
-    def render(
-        self, matrix: Matrix2x3 | None = None, use_original_size: bool = False
-    ) -> Image.Image:
+    def render(self, matrix: Matrix2x3 | None = None) -> Image.Image:
         transformed_points = self.apply_matrix(matrix)
 
         rect = get_rect(transformed_points)
         width, height = max(int(rect.width), 1), max(int(rect.height), 1)
 
-        self.rotation, self.is_mirrored = compare_polygons(
-            transformed_points, self._uv_points
-        )
+        rotation, is_mirrored = compare_polygons(transformed_points, self._uv_points)
 
         rendered_region = self.get_image()
         if rendered_region.width + rendered_region.height <= 2:
@@ -72,12 +66,9 @@ class Region:
                 rendered_region.mode, width, height, transformed_points, fill_color
             )
 
-        if self.is_mirrored:
+        if is_mirrored:
             rendered_region = rendered_region.transpose(Image.Transpose.FLIP_LEFT_RIGHT)
-        rendered_region = rendered_region.rotate(-self.rotation, expand=True)
-
-        if use_original_size:
-            return rendered_region
+        rendered_region = rendered_region.rotate(-rotation, expand=True)
 
         return rendered_region.resize((width, height), Image.Resampling.LANCZOS)
 

@@ -60,7 +60,7 @@ def render_objects(swf: SupercellSWF, output_folder: Path):
         for region_index in range(regions_count):
             region = shape.regions[region_index]
 
-            rendered_region = region.render(use_original_size=True)
+            rendered_region = region.get_image()
             rendered_region.save(f"{output_folder}/shape_{shape.id}_{region_index}.png")
 
     for shape_index in range(shapes_count):
@@ -78,5 +78,3 @@ def render_objects(swf: SupercellSWF, output_folder: Path):
             for i in range(region.get_point_count()):
                 swf.xcod_writer.write_uint16(int(region.get_u(i)))
                 swf.xcod_writer.write_uint16(int(region.get_v(i)))
-            swf.xcod_writer.write_ubyte(1 if region.is_mirrored else 0)
-            swf.xcod_writer.write_byte(region.rotation // 90)

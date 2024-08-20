@@ -25,7 +25,7 @@ def is_clockwise(polygon: Polygon) -> bool:
 def compare_polygons(
     polygon1: Polygon,
     polygon2: Polygon,
-) -> tuple[int, bool]:
+) -> tuple[float, bool]:
     """Calculates rotation and if polygon is mirrored.
 
     :param polygon1: shape polygon
@@ -48,7 +48,7 @@ def compare_polygons(
 
     angle = (angle_xy - angle_uv) % 360
 
-    return int(angle), mirroring
+    return angle, mirroring
 
 
 def get_rect(polygon: list[Point]) -> Rect:

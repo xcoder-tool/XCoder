@@ -30,8 +30,6 @@ class SheetInfo:
 class RegionInfo:
     texture_id: int
     points: list[Point]
-    is_mirrored: bool
-    rotation: int
 
 
 @dataclass
@@ -95,9 +93,7 @@ def parse_detailed_info(file_info: FileInfo, reader: Reader) -> None:
                 for _ in range(points_count)
             ]
 
-            is_mirrored, rotation = reader.read_uchar() == 1, reader.read_char() * 90
-
-            regions.append(RegionInfo(texture_id, points, is_mirrored, rotation))
+            regions.append(RegionInfo(texture_id, points))
 
         file_info.shapes.append(ShapeInfo(shape_id, regions))
 
