@@ -81,6 +81,13 @@ class RenderableMovieClip(DisplayObject):
         for child in self._frame_children:
             rect.merge_bounds(child.calculate_bounds(matrix_multiplied))
 
+        rect = Rect(
+            left=round(rect.left),
+            top=round(rect.top),
+            right=round(rect.right),
+            bottom=round(rect.bottom),
+        )
+
         return rect
 
     def set_frame(self, frame_index: int):

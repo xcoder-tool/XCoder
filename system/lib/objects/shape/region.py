@@ -59,7 +59,7 @@ class Region:
     def render(self, matrix: Matrix2x3) -> Image.Image:
         transformed_points = apply_matrix(self._xy_points, matrix)
 
-        rect = get_rect(transformed_points)
+        rect = self.calculate_bounds(matrix)
         width, height = max(int(rect.width), 1), max(int(rect.height), 1)
 
         rendered_region = self.get_image()
@@ -135,4 +135,11 @@ class Region:
         return self._xy_points[index].y
 
     def calculate_bounds(self, matrix: Matrix2x3 | None = None) -> Rect:
-        return get_rect(apply_matrix(self._xy_points, matrix))
+        rect = get_rect(apply_matrix(self._xy_points, matrix))
+        rect = Rect(
+            left=round(rect.left),
+            top=round(rect.top),
+            right=round(rect.right),
+            bottom=round(rect.bottom),
+        )
+        return rect

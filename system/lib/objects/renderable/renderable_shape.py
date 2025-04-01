@@ -43,4 +43,11 @@ class RenderableShape(DisplayObject):
         for region in self._regions:
             rect.merge_bounds(region.calculate_bounds(matrix_multiplied))
 
+        rect = Rect(
+            left=round(rect.left),
+            top=round(rect.top),
+            right=round(rect.right),
+            bottom=round(rect.bottom),
+        )
+
         return rect

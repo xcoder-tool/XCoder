@@ -86,6 +86,15 @@ def _write_rgb5a1(pixel: PixelChannels) -> bytes:
     return struct.pack("<H", a >> 7 | b >> 3 << 1 | g >> 3 << 6 | r >> 3 << 11)
 
 
+# TODO: rewrite with numpy https://qna.habr.com/q/298153
+# rgb888 = numpy.asarray(Image.open(filename))
+# # check that image have 3 color components, each of 8 bits
+# assert rgb888.shape[-1] == 3 and rgb888.dtype == numpy.uint8
+# r5 = (rgb888[..., 0] >> 3 & 0x1f).astype(numpy.uint16)
+# g6 = (rgb888[..., 1] >> 2 & 0x3f).astype(numpy.uint16)
+# b5 = (rgb888[..., 2] >> 3 & 0x1f).astype(numpy.uint16)
+# rgb565 = r5 << 11 | g6 << 5 | b5
+# return rgb565.tobytes()
 def _write_rgb565(pixel: PixelChannels) -> bytes:
     r, g, b = pixel
     return struct.pack("<H", b >> 3 | g >> 2 << 5 | r >> 3 << 11)
