@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "xcoder"
+version = "0.1.0"
+description = ""
+authors = ["Danila <crowo4ka@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+sc-compression = "0.6.5"
+colorama = "0.4.6"
+pylzham = "^0.1.3"
+zstandard = "^0.23.0"
+pillow = "11.2.0"
+loguru = "0.7.3"
+
+
+[tool.poetry.group.dev.dependencies]
+pyright = "^1.1.376"
+black = "^24.8.0"
+pre-commit = "^3.8.0"
+ruff = "^0.11.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

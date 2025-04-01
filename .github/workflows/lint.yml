@@ -1,27 +1,38 @@
-name: Lint
+name: Lint and test
 
-on: [push, pull_request]
+on: [push]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{matrix.os}}
+    strategy:
+      matrix:
+        python: ["3.11", "3.12"]
+        os: ["ubuntu-latest", "windows-latest"]
     
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python 3.11
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{matrix.python}}
         uses: actions/setup-python@v4
         with:
-          python-version: "3.11"
+          python-version: ${{matrix.python}}
 
-      - name: Install requirements
+      - name: Install poetry
         run: |
-          pip install flake8 pyright
-          pip install -r requirements.txt
+          pip install pipx
+          pipx install poetry
 
-      - name: Linting code by flake8
+      - name: Install dependencies
         run: |
-          flake8 --show-source --statistics
+          poetry install
+
+      - name: Linting code by ruff
+        run: |
+          poetry run ruff check .
 
       - name: Check types by pyright
         run: |
-          pyright
+          poetry run pyright .
+
+      - name: Run unit-tests
+        run: poetry run python -m unittest
