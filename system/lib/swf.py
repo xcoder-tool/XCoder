@@ -80,7 +80,7 @@ class SupercellSWF:
 
         logger.info(locale.collecting_inf % self.filename)
 
-        decompressed_data, signature = open_sc(filepath)
+        decompressed_data, signature, version = open_sc(filepath)
 
         if signature.name != Signatures.NONE:
             logger.info(locale.detected_comp % signature.name.upper())

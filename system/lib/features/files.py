@@ -17,13 +17,14 @@ def write_sc(
         file_out.write(compress(buffer, signature, version))  # type: ignore
 
 
-def open_sc(input_filename: os.PathLike | str) -> tuple[bytes, Signatures]:
+def open_sc(input_filename: os.PathLike | str) -> tuple[bytes, Signatures, int]:
     with open(input_filename, "rb") as f:
         file_data = f.read()
 
     try:
         if b"START" in file_data:
             file_data = file_data[: file_data.index(b"START")]
+
         return decompress(file_data)
     except TypeError:
         logger.info(locale.decompression_error)
