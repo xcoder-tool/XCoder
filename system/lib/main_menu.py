@@ -7,7 +7,7 @@ from system.lib.config import config
 from system.lib.console import Console
 from system.lib.features.directories import clear_directories
 from system.lib.features.initialization import initialize
-from system.lib.features.update.check import check_for_outdated, check_update, get_tags
+from system.lib.features.update.check import check_update, get_tags
 from system.lib.menu import Menu
 from system.localization import locale
 
@@ -157,7 +157,6 @@ def refill_menu():
             handler=check_update,
         )
     )
-    other.add(Menu.Item(name=locale.check_for_outdated, handler=check_for_outdated))
     other.add(
         Menu.Item(
             name=locale.reinit,

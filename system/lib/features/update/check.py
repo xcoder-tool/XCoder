@@ -42,11 +42,7 @@ def get_tags(owner: str, repo: str):
     import urllib.request
 
     tags = json.loads(
-        urllib.request.urlopen(
-            api_url + "/repos/{owner}/{repo}/tags".format(owner=owner, repo=repo)
-        )
-        .read()
-        .decode()
+        urllib.request.urlopen(api_url + f"/repos/{owner}/{repo}/tags").read().decode()
     )
     tags = [
         {key: v for key, v in tag.items() if key in ["name", "zipball_url"]}
@@ -63,21 +59,9 @@ def check_update():
         latest_tag = tags[0]
         latest_tag_name = latest_tag["name"][1:]  # clear char 'v' at string start
 
-        check_for_outdated()
-
         logger.info(locale.check_update)
         if config.version != latest_tag_name:
             logger.error(locale.not_latest)
 
             logger.info(locale.update_downloading)
             download_update(latest_tag["zipball_url"])
-
-
-def check_for_outdated():
-    logger.info(locale.check_for_outdated)
-    required_packages = [
-        pkg.rstrip("\n").lower() for pkg in open("requirements.txt").readlines()
-    ]
-    outdated_packages = [pkg[0].lower() for pkg in get_pip_info(True)]
-
-    return [package for package in required_packages if package in outdated_packages]

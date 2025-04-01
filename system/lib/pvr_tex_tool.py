@@ -5,7 +5,7 @@ from pathlib import Path
 from PIL import Image
 
 from system import run
-from system.exceptions.tool_not_found import ToolNotFoundException
+from system.exceptions import ToolNotFoundException
 
 _main_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 _color_space = "sRGB"
@@ -19,6 +19,7 @@ def _get_executable_path(*paths: str) -> str | None:
     from shutil import which
 
     for path in paths:
+        # Fix of https://github.com/xcoder-tool/XCoder/issues/22
         executable_path = which(path)
         if executable_path is not None:
             return path

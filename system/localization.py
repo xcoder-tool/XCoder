@@ -50,7 +50,6 @@ class Locale:
 
         self.other_features_label: str = DEFAULT_STRING
         self.check_update: str = DEFAULT_STRING
-        self.check_for_outdated: str = DEFAULT_STRING
         self.reinit: str = DEFAULT_STRING
         self.change_language: str = DEFAULT_STRING
         self.clear_directories: str = DEFAULT_STRING
@@ -72,7 +71,6 @@ class Locale:
         self.join_pic: str = DEFAULT_STRING
         self.png_save: str = DEFAULT_STRING
         self.saved: str = DEFAULT_STRING
-        self.xcod_not_found: str = DEFAULT_STRING
         self.illegal_size: str = DEFAULT_STRING
         self.resize_qu: str = DEFAULT_STRING
         self.resizing: str = DEFAULT_STRING
@@ -82,7 +80,8 @@ class Locale:
         self.compression_error: str = DEFAULT_STRING
         self.compression_done: str = DEFAULT_STRING
         self.dir_empty: str = DEFAULT_STRING
-        self.not_found: str = DEFAULT_STRING
+        self.texture_not_found: str = DEFAULT_STRING
+        self.file_not_found: str = DEFAULT_STRING
         self.cut_sprites_process: str = DEFAULT_STRING
         self.place_sprites_process: str = DEFAULT_STRING
         self.not_implemented: str = DEFAULT_STRING

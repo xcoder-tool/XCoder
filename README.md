@@ -15,51 +15,34 @@ Supercell\`s games.
 ### How to install and use
 
 - On Windows:
-    - Download Python 3.7 or newer version
+    - Download Python 3.10 or newer version
       from [official page](https://www.python.org/downloads/);
     - Install Python. While Installing, enable such parameters as "Add Python to
-      PATH", "Install pip", "Install py launcher", "Associate files with Python" and "
-      Add Python to environment variables";
+      PATH", "Install pip", "Install py launcher", "Associate files with Python" and "Add Python to environment variables";
     - Download XCoder from
       the [releases page](https://github.com/Vorono4ka/XCoder/releases) and extract it;
     - Locate the extracted directory and install required modules:
-      ```pip install -r requirements.txt```;
+      ```cmd
+      poetry install
+      ```
     - Execute "main.py" file.
 
 - On Linux:
     - Open Terminal and install Python by executing following command:
-      ```sudo apt-get update && sudo apt-get install python3 python3-pip```;
+      ```sudo apt-get update && sudo apt-get install python3 python3-poetry```;
     - Download XCoder from
       the [releases page](https://github.com/Vorono4ka/XCoder/releases) and extract it;
     - Locate the extracted directory and install required modules by executing following
       command:
-      ```sudo pip3 install -r requirements.txt```;
+      ```sh
+      poetry install
+      ```
     - Execute "main.py" file.
-
-- On Android:
-    - Download and install PyDroid app
-      from [Google Play](https://play.google.com/store/apps/details?id=ru.iiec.pydroid3);
-    - Open PyDroid and wait until Python installs;
-    - Download XCoder from
-      the [releases page](https://github.com/Vorono4ka/XCoder/releases) and extract it;
-    - Install loguru using pip;
-    - In PyDroid open and execute "main.py" file.
 
 ### Testing
 
-The project supports unit-testing using the unittest module. To run tests by yourself, you can use the command:
-
-```cmd
-python -m unittest
-```
-
-or
-
-```sh
-python3 -m unittest
-```
-
-or using the poetry
+The project supports unit-testing using the unittest module. To run tests by yourself,
+use the command:
 
 ```sh
 poetry run python -m unittest

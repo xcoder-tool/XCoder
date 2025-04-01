@@ -4,20 +4,16 @@ from typing import Callable, TypeAlias
 from system.bytestream import Reader
 
 PixelChannels: TypeAlias = tuple[int, ...]
-WriteFunction: TypeAlias = Callable[[PixelChannels], bytes]
-ReadFunction: TypeAlias = Callable[[Reader], PixelChannels]
+EncodeFunction: TypeAlias = Callable[[PixelChannels], bytes]
+DecodeFunction: TypeAlias = Callable[[Reader], PixelChannels]
 
 
-def get_read_function(pixel_type: int) -> ReadFunction | None:
-    if pixel_type in _read_functions:
-        return _read_functions[pixel_type]
-    return None
+def get_read_function(pixel_type: int) -> DecodeFunction | None:
+    return _decode_functions.get(pixel_type, None)
 
 
-def get_write_function(pixel_type: int) -> WriteFunction | None:
-    if pixel_type in _write_functions:
-        return _write_functions[pixel_type]
-    return None
+def get_pixel_encode_function(pixel_type: int) -> EncodeFunction | None:
+    return _encode_functions.get(pixel_type, None)
 
 
 def get_channel_count_by_pixel_type(pixel_type: int) -> int:
@@ -108,7 +104,7 @@ def _write_luminance8(pixel: PixelChannels) -> bytes:
     return struct.pack("B", pixel)
 
 
-_write_functions: dict[int, WriteFunction] = {
+_encode_functions: dict[int, EncodeFunction] = {
     0: _write_rgba8,
     1: _write_rgba8,
     2: _write_rgba4,
@@ -118,7 +114,7 @@ _write_functions: dict[int, WriteFunction] = {
     10: _write_luminance8,
 }
 
-_read_functions: dict[int, ReadFunction] = {
+_decode_functions: dict[int, DecodeFunction] = {
     0: _read_rgba8,
     1: _read_rgba8,
     2: _read_rgba4,

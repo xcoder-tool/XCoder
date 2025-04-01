@@ -21,15 +21,15 @@ def decode_textures_only():
 
     files = os.listdir(input_folder)
     for file in files:
+        # Note: otherwise both _tex.sc and .sc will be loaded, which is a bug
         if not file.endswith("_tex.sc"):
             continue
 
-        swf = SupercellSWF()
-        base_name = os.path.basename(file).rsplit(".", 1)[0]
         try:
+            swf = SupercellSWF()
             texture_loaded, signature = swf.load(f"{input_folder / file}")
             if not texture_loaded:
-                logger.error(locale.not_found % f"{base_name}_tex.sc")
+                logger.error(locale.texture_not_found % file)
                 continue
 
             base_name = get_file_basename(swf)
@@ -65,12 +65,10 @@ def decode_and_render_objects():
             continue
 
         try:
-            base_name = os.path.basename(file).rsplit(".", 1)[0]
-
             swf = SupercellSWF()
             texture_loaded, signature = swf.load(input_folder / file)
             if not texture_loaded:
-                logger.error(locale.not_found % f"{base_name}_tex.sc")
+                logger.error(locale.texture_not_found % file)
                 continue
 
             base_name = get_file_basename(swf)

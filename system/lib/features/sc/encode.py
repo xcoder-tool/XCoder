@@ -57,7 +57,7 @@ def _ensure_metadata_exists(input_folder: Path, file: str) -> Path | None:
     metadata_file_path = input_folder / metadata_file_name
 
     if not os.path.exists(metadata_file_path):
-        logger.error(locale.not_found % metadata_file_name)
+        logger.error(locale.file_not_found % metadata_file_name)
         print()
         return None
 

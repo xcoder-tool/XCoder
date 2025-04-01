@@ -1,7 +1,10 @@
 import math
+from typing import TYPE_CHECKING
 
-import PIL.PyAccess
 from PIL import Image, ImageDraw
+
+if TYPE_CHECKING:
+    from PIL._imaging import PixelAccess  # type: ignore[reportPrivateImportUsage]
 
 from system.bytestream import Reader, Writer
 from system.lib.console import Console
@@ -9,8 +12,8 @@ from system.lib.math.point import Point
 from system.lib.matrices import Matrix2x3
 from system.lib.pixel_utils import (
     get_channel_count_by_pixel_type,
+    get_pixel_encode_function,
     get_read_function,
-    get_write_function,
 )
 from system.localization import locale
 
@@ -19,14 +22,16 @@ CHUNK_SIZE = 32
 
 def load_image_from_buffer(img: Image.Image) -> None:
     width, height = img.size
-    img_loaded: PIL.PyAccess.PyAccess = img.load()  # type: ignore
+    loaded_image = img.load()
+    if loaded_image is None:
+        raise Exception("loaded_image is None")
 
     with open("pixel_buffer", "rb") as pixel_buffer:
         channel_count = int.from_bytes(pixel_buffer.read(1), "little")
 
         for y in range(height):
             for x in range(width):
-                img_loaded[x, y] = tuple(pixel_buffer.read(channel_count))
+                loaded_image[x, y] = tuple(pixel_buffer.read(channel_count))
 
 
 def join_image(img: Image.Image) -> None:
@@ -34,8 +39,9 @@ def join_image(img: Image.Image) -> None:
         channel_count = int.from_bytes(pixel_buffer.read(1), "little")
 
         width, height = img.size
-        # noinspection PyTypeChecker
-        loaded_img: PIL.PyAccess.PyAccess = img.load()  # type: ignore
+        loaded_image = img.load()
+        if loaded_image is None:
+            raise Exception("loaded_image is None")
 
         x_chunks_count = width // CHUNK_SIZE
         y_chunks_count = height // CHUNK_SIZE
@@ -52,22 +58,29 @@ def join_image(img: Image.Image) -> None:
                         if pixel_x >= width:
                             break
 
-                        loaded_img[pixel_x, pixel_y] = tuple(
+                        loaded_image[pixel_x, pixel_y] = tuple(
                             pixel_buffer.read(channel_count)
                         )
 
             Console.progress_bar(locale.join_pic, y_chunk, y_chunks_count + 1)
 
 
-def split_image(img: Image.Image) -> None:
-    def add_pixel(pixel: tuple) -> None:
-        loaded_image[pixel_index % width, int(pixel_index / width)] = pixel
+def _add_pixel(
+    image: "PixelAccess", pixel_index: int, width: int, color: tuple
+) -> None:
+    image[pixel_index % width, int(pixel_index / width)] = color
 
+
+def split_image(img: Image.Image) -> None:
     width, height = img.size
-    # noinspection PyTypeChecker
-    loaded_image: PIL.PyAccess.PyAccess = img.load()  # type: ignore
-    # noinspection PyTypeChecker
-    loaded_clone: PIL.PyAccess.PyAccess = img.copy().load()  # type: ignore
+
+    loaded_image = img.load()
+    if loaded_image is None:
+        raise Exception("loaded_image is None")
+
+    loaded_clone = img.copy().load()
+    if loaded_clone is None:
+        raise Exception("loaded_clone is None")
 
     x_chunks_count = width // CHUNK_SIZE
     y_chunks_count = height // CHUNK_SIZE
@@ -86,7 +99,9 @@ def split_image(img: Image.Image) -> None:
                     if pixel_x >= width:
                         break
 
-                    add_pixel(loaded_clone[pixel_x, pixel_y])  # type: ignore
+                    _add_pixel(
+                        loaded_image, pixel_index, width, loaded_clone[pixel_x, pixel_y]
+                    )
                     pixel_index += 1
 
         Console.progress_bar(locale.split_pic, y_chunk, y_chunks_count + 1)
@@ -139,8 +154,8 @@ def load_texture(reader: Reader, pixel_type: int, img: Image.Image) -> None:
 
 
 def save_texture(writer: Writer, image: Image.Image, pixel_type: int) -> None:
-    write_pixel = get_write_function(pixel_type)
-    if write_pixel is None:
+    encode_pixel = get_pixel_encode_function(pixel_type)
+    if encode_pixel is None:
         raise Exception(locale.unknown_pixel_type % pixel_type)
 
     width, height = image.size
@@ -149,7 +164,8 @@ def save_texture(writer: Writer, image: Image.Image, pixel_type: int) -> None:
     point = -1
     for y in range(height):
         for x in range(width):
-            writer.write(write_pixel(pixels[y * width + x]))  # type: ignore
+            # noinspection PyTypeChecker
+            writer.write(encode_pixel(pixels[y * width + x]))
 
         curr = Console.percent(y, height)
         if curr > point:
