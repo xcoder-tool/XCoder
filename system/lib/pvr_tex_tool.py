@@ -16,10 +16,10 @@ _quality = "etcfast"
 # Note: a solution from
 # https://stackoverflow.com/questions/11210104/check-if-a-program-exists-from-a-python-script
 def _get_executable_path(*paths: str) -> str | None:
-    from distutils.spawn import find_executable
+    from shutil import which
 
     for path in paths:
-        executable_path = find_executable(path)
+        executable_path = which(path)
         if executable_path is not None:
             return path
 
@@ -27,7 +27,7 @@ def _get_executable_path(*paths: str) -> str | None:
 
 
 _cli_name = "PVRTexToolCLI"
-_cli_path = _get_executable_path(_cli_name, f"{_main_dir}/system/bin/{_cli_name}")
+_cli_path = _get_executable_path(f"{_main_dir}/system/bin/{_cli_name}", _cli_name)
 
 
 def can_use_pvr_tex_tool() -> bool:
