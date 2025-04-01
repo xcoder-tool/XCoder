@@ -31,8 +31,8 @@
     "csv_label": "CSV",
     "decompress_csv": "Розпакувати CSV",
     "compress_csv": "Запакуати CSV",
-    "decompress_csv_description": "Розпакувати файл таблиці",
-    "compress_csv_description": "Запакувати файл таблиці",
+    "decompress_csv_description": "Розпакувати CSV",
+    "compress_csv_description": "Запакувати CSV",
 
     "ktx_label": "KTX",
     "ktx_from_png_label": "PNG2KTX",
@@ -65,7 +65,7 @@
     "saved": "Збереження Виконано!",
     "illegal_size": "Неможливий розмір картинки! Очікували %sx%s але отримали %sx%s",
     "resize_qu": "Ти хочеш змінити розмір картинки?",
-    "resizing": "змінюємо розмір...",
+    "resizing": "Змінюємо розмір...",
     "split_pic": "Розділюємо зоображення...",
     "writing_pic": "Записуємо пікселі...",
     "compressing_with": "Запаковуємо з %s...",
@@ -90,5 +90,5 @@
     "enabled": "Включено",
     "disabled": "Виключено",
 
-    "install_to_unlock": "Встанови '%s' щоб розблокувати більше функції!"
+    "install_to_unlock": "Встанови '%s' щоб розблокувати більше функцій!"
 }

@@ -1,58 +1,46 @@
 # XCoder - easy to use modding tool
 
-Multiplatform modding tool for ANY Supercell\`s game.
+A multiplatform modding tool designed for ANY Supercell game.
 
 ## About
 
-Work with Supercell\`s files on **any** os! SC and CSV are supported for all
-Supercell\`s games.
+Effortlessly work with Supercell\`s game files! XCoder offers support for SC and CSV
+formats across all Supercell games.
 
-### Features:
+### Features
 
 - SC compile / decompile
 - Compression and decompression
 
-### How to install and use
+### Installation and Usage
 
-- On Windows:
-    - Download Python 3.10 or newer version
-      from [official page](https://www.python.org/downloads/)
-    - Install Python. While Installing, enable such parameters as "Add Python to
-      PATH", "Install pip", "Install py launcher", "Associate files with Python" and "Add Python to environment variables"
-    - Download XCoder from the [releases page](https://github.com/xcoder-tool/XCoder/releases) and extract it
-    - Locate the extracted directory and install required modules:
-      ```cmd
-      poetry install
-      ```
-    - Run program with 
-      ```cmd
-      poetry run python -m xcoder
-      ```
+**Windows**:
 
-- On Linux:
-  - Open Terminal and install Python by executing following command:
+1. Download Python 3.10 or newer version from
+   the [official page](https://www.python.org/downloads/)
+2. Install Python. While Installing, enable such parameters as "Add Python to
+   PATH", "Install pip", "Install py launcher", "Associate files with Python" and "Add
+   Python to environment variables"
+
+**Linux**:
+
+1. Open Terminal and install Python using:
     ```sh
     sudo apt-get update && sudo apt-get install python3 python3-poetry
     ```
-  - Download XCoder from the [releases page](https://github.com/xcoder-tool/XCoder/releases) and extract it
-  - Locate the extracted directory and install required modules by executing following
-  command:
+
+**Common steps**:
+
+1. Download XCoder from
+   the [releases page](https://github.com/xcoder-tool/XCoder/releases) and extract it
+2. Go to the extracted directory and install required modules by executing:
     ```sh
     poetry install
     ```
-  - Run program with
-    ```cmd
+3. Run program with
+    ```sh
     poetry run python -m xcoder
     ```
-
-### Testing
-
-The project supports unit-testing using the unittest module. To run tests by yourself,
-use the command:
-
-```sh
-poetry run python -m unittest
-```
 
 ### How to enable KTX section
 
@@ -64,15 +52,15 @@ perform this step.**
 To enable the KTX module, you need to get the "PVRTexToolCLI" binary from the official
 site: https://developer.imaginationtech.com/pvrtextool/.
 
-Then it is necessary to put CLI in "bin/" folder in the main script folder.
+Then it is necessary to put CLI in "bin/" folder in the main script folder or add it to
+your PATH environment variable.
 
-### In the plans:
+### Planned Features
 
-- CSV updating.
+- CSV updating
 
 ## Credits
 
-This tool is based on Original [XCoder](https://github.com/MasterDevX/xcoder),
-Developer: [MasterDevX](https://github.com/MasterDevX)</br>
-
-Many thanks to [spiky_Spike](https://github.com/spiky-s) for the provided developments
+XCoder is based on the original [XCoder](https://github.com/MasterDevX/xcoder),
+developed by [MasterDevX](https://github.com/MasterDevX).</br>
+Special thanks to [spiky_Spike](https://github.com/spiky-s) for their contributions.
