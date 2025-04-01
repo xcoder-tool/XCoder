@@ -1,7 +1,6 @@
 from unittest import TestCase
 
-from system.lib.math.point import Point
-from system.lib.math.polygon import PointOrder, Polygon, get_polygon_point_order
+from xcoder.math import Point, PointOrder, Polygon, get_polygon_point_order
 
 
 def create_polygon_from_tuple(*polygon: tuple[float, float]) -> Polygon:

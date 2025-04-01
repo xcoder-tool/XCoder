@@ -9,35 +9,41 @@ Supercell\`s games.
 
 ### Features:
 
-- SC compile / decompile;
-- Compression and decompression.
+- SC compile / decompile
+- Compression and decompression
 
 ### How to install and use
 
 - On Windows:
     - Download Python 3.10 or newer version
-      from [official page](https://www.python.org/downloads/);
+      from [official page](https://www.python.org/downloads/)
     - Install Python. While Installing, enable such parameters as "Add Python to
-      PATH", "Install pip", "Install py launcher", "Associate files with Python" and "Add Python to environment variables";
-    - Download XCoder from
-      the [releases page](https://github.com/Vorono4ka/XCoder/releases) and extract it;
+      PATH", "Install pip", "Install py launcher", "Associate files with Python" and "Add Python to environment variables"
+    - Download XCoder from the [releases page](https://github.com/xcoder-tool/XCoder/releases) and extract it
     - Locate the extracted directory and install required modules:
       ```cmd
       poetry install
       ```
-    - Execute "main.py" file.
+    - Run program with 
+      ```cmd
+      poetry run python -m xcoder
+      ```
 
 - On Linux:
-    - Open Terminal and install Python by executing following command:
-      ```sudo apt-get update && sudo apt-get install python3 python3-poetry```;
-    - Download XCoder from
-      the [releases page](https://github.com/Vorono4ka/XCoder/releases) and extract it;
-    - Locate the extracted directory and install required modules by executing following
-      command:
-      ```sh
-      poetry install
-      ```
-    - Execute "main.py" file.
+  - Open Terminal and install Python by executing following command:
+    ```sh
+    sudo apt-get update && sudo apt-get install python3 python3-poetry
+    ```
+  - Download XCoder from the [releases page](https://github.com/xcoder-tool/XCoder/releases) and extract it
+  - Locate the extracted directory and install required modules by executing following
+  command:
+    ```sh
+    poetry install
+    ```
+  - Run program with
+    ```cmd
+    poetry run python -m xcoder
+    ```
 
 ### Testing
 
@@ -58,7 +64,7 @@ perform this step.**
 To enable the KTX module, you need to get the "PVRTexToolCLI" binary from the official
 site: https://developer.imaginationtech.com/pvrtextool/.
 
-Then it is necessary to put CLI in "system/bin/" folder in the main script folder.
+Then it is necessary to put CLI in "bin/" folder in the main script folder.
 
 ### In the plans:
 
