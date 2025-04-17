@@ -24,7 +24,7 @@ def load_image_from_buffer(pixel_type: int, width: int, height: int) -> Image.Im
     with open("pixel_buffer", "rb") as pixel_buffer:
         pixel_buffer.read(1)
 
-        return Image.frombytes(
+        return Image.frombuffer(
             get_format_by_pixel_type(pixel_type), (width, height), pixel_buffer.read()
         )
 
@@ -51,7 +51,6 @@ def join_image(pixel_type: int, width: int, height: int) -> Image.Image:
                 mode,
                 (chunk_width, chunk_height),
                 pixel_buffer.read(channel_count * chunk_width * chunk_height),
-                "raw",
             )
 
             image.paste(sub_image, (chunk_x * CHUNK_SIZE, chunk_y * CHUNK_SIZE))
