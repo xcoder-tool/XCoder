@@ -20,49 +20,44 @@ from .pixel_utils import (
 CHUNK_SIZE = 32
 
 
-def load_image_from_buffer(img: Image.Image) -> None:
-    width, height = img.size
-    loaded_image = img.load()
-    if loaded_image is None:
-        raise Exception("loaded_image is None")
+def load_image_from_buffer(pixel_type: int, width: int, height: int) -> Image.Image:
+    with open("pixel_buffer", "rb") as pixel_buffer:
+        pixel_buffer.read(1)
+
+        return Image.frombuffer(
+            get_format_by_pixel_type(pixel_type), (width, height), pixel_buffer.read()
+        )
+
+
+def join_image(pixel_type: int, width: int, height: int) -> Image.Image:
+    mode = get_format_by_pixel_type(pixel_type)
+    image = Image.new(mode, (width, height))
 
     with open("pixel_buffer", "rb") as pixel_buffer:
         channel_count = int.from_bytes(pixel_buffer.read(1), "little")
 
-        for y in range(height):
-            for x in range(width):
-                loaded_image[x, y] = tuple(pixel_buffer.read(channel_count))
+        chunk_count_x = math.ceil(width / CHUNK_SIZE)
+        chunk_count_y = math.ceil(height / CHUNK_SIZE)
+        chunk_count = chunk_count_x * chunk_count_y
 
+        for chunk_index in range(chunk_count):
+            chunk_x = chunk_index % chunk_count_x
+            chunk_y = chunk_index // chunk_count_x
 
-def join_image(img: Image.Image) -> None:
-    with open("pixel_buffer", "rb") as pixel_buffer:
-        channel_count = int.from_bytes(pixel_buffer.read(1), "little")
+            chunk_width = min(width - chunk_x * CHUNK_SIZE, CHUNK_SIZE)
+            chunk_height = min(height - chunk_y * CHUNK_SIZE, CHUNK_SIZE)
 
-        width, height = img.size
-        loaded_image = img.load()
-        if loaded_image is None:
-            raise Exception("loaded_image is None")
+            sub_image = Image.frombuffer(
+                mode,
+                (chunk_width, chunk_height),
+                pixel_buffer.read(channel_count * chunk_width * chunk_height),
+            )
 
-        x_chunks_count = width // CHUNK_SIZE
-        y_chunks_count = height // CHUNK_SIZE
+            image.paste(sub_image, (chunk_x * CHUNK_SIZE, chunk_y * CHUNK_SIZE))
 
-        for y_chunk in range(y_chunks_count + 1):
-            for x_chunk in range(x_chunks_count + 1):
-                for y in range(CHUNK_SIZE):
-                    pixel_y = y_chunk * CHUNK_SIZE + y
-                    if pixel_y >= height:
-                        break
+            Console.progress_bar(locale.join_pic, chunk_index, chunk_count)
 
-                    for x in range(CHUNK_SIZE):
-                        pixel_x = x_chunk * CHUNK_SIZE + x
-                        if pixel_x >= width:
-                            break
-
-                        loaded_image[pixel_x, pixel_y] = tuple(
-                            pixel_buffer.read(channel_count)
-                        )
-
-            Console.progress_bar(locale.join_pic, y_chunk, y_chunks_count + 1)
+    return image
 
 
 def _add_pixel(
@@ -130,7 +125,7 @@ def get_format_by_pixel_type(pixel_type: int) -> str:
     raise Exception(locale.unknown_pixel_type % pixel_type)
 
 
-def load_texture(reader: Reader, pixel_type: int, img: Image.Image) -> None:
+def load_texture(reader: Reader, pixel_type: int, width: int, height: int) -> None:
     channel_count = get_channel_count_by_pixel_type(pixel_type)
     read_pixel = get_read_function(pixel_type)
     if read_pixel is None:
@@ -139,18 +134,12 @@ def load_texture(reader: Reader, pixel_type: int, img: Image.Image) -> None:
     with open("pixel_buffer", "wb") as pixel_buffer:
         pixel_buffer.write(channel_count.to_bytes(1, "little"))
 
-        width, height = img.size
-        point = -1
         for y in range(height):
-            for x in range(width):
-                pixel = read_pixel(reader)
-                for channel in pixel:
-                    pixel_buffer.write(channel.to_bytes(1, "little"))
+            pixel_buffer.write(
+                b"".join([bytearray(read_pixel(reader)) for _ in range(width)])
+            )
 
-            curr = Console.percent(y, height)
-            if curr > point:
-                Console.progress_bar(locale.crt_pic, y, height)
-                point = curr
+            Console.progress_bar(locale.crt_pic, y, height)
 
 
 def save_texture(writer: Writer, image: Image.Image, pixel_type: int) -> None:
@@ -161,16 +150,12 @@ def save_texture(writer: Writer, image: Image.Image, pixel_type: int) -> None:
     width, height = image.size
 
     pixels = image.getdata()
-    point = -1
     for y in range(height):
         for x in range(width):
             # noinspection PyTypeChecker
             writer.write(encode_pixel(pixels[y * width + x]))
 
-        curr = Console.percent(y, height)
-        if curr > point:
-            Console.progress_bar(locale.writing_pic, y, height)
-            point = curr
+        Console.progress_bar(locale.writing_pic, y, height)
 
 
 def transform_image(

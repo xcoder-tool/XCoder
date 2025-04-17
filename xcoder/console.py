@@ -1,15 +1,19 @@
 class Console:
-    @staticmethod
-    def progress_bar(message, current, total):
-        percentage = (current + 1) * 100 // total
-        print("\r", end="")
-        print(f"[{percentage}%] {message}", end="")
-        if current + 1 == total:
-            print()
+    previous_percentage: int = -1
 
-    @staticmethod
-    def percent(current: int, total: int) -> int:
-        return (current + 1) * 100 // total
+    @classmethod
+    def progress_bar(cls, message: str, current: int, total: int) -> None:
+        percentage = (current + 1) * 100 // total
+        if percentage == cls.previous_percentage:
+            return
+
+        print(f"\r[{percentage}%] {message}", end="")
+
+        if percentage == 100:
+            print()
+            cls.previous_percentage = -1
+        else:
+            cls.previous_percentage = percentage
 
     @staticmethod
     def ask_integer(message: str):
@@ -20,13 +24,16 @@ class Console:
                 pass
 
     @staticmethod
-    def question(message):
+    def question(message: str) -> bool:
         while True:
             answer = input(f"[????] {message} [Y/n] ").lower()
+            if not answer:
+                return True
+
             if answer in "ny":
                 break
 
-        return "ny".index(answer)
+        return bool("ny".index(answer))
 
 
 if __name__ == "__main__":
