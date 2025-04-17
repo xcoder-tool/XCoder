@@ -27,12 +27,7 @@ def get_channel_count_by_pixel_type(pixel_type: int) -> int:
 
 
 def _read_rgba8(reader: Reader) -> PixelChannels:
-    return (
-        reader.read_uchar(),
-        reader.read_uchar(),
-        reader.read_uchar(),
-        reader.read_uchar(),
-    )
+    return tuple(reader.read(4))
 
 
 def _read_rgba4(reader: Reader) -> PixelChannels:
@@ -61,11 +56,11 @@ def _read_rgb565(reader: Reader) -> PixelChannels:
 
 
 def _read_luminance8_alpha8(reader: Reader) -> PixelChannels:
-    return (reader.read_uchar(), reader.read_uchar())[::-1]
+    return tuple(reader.read(2))[::-1]
 
 
 def _read_luminance8(reader: Reader) -> PixelChannels:
-    return (reader.read_uchar(),)
+    return tuple(reader.read(1))
 
 
 def _write_rgba8(pixel: PixelChannels) -> bytes:

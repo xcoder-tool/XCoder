@@ -1,36 +1,45 @@
 import io
+import struct
 from typing import Literal
 
 
-class Reader(io.BytesIO):
+class Reader:
     def __init__(
         self,
         initial_buffer: bytes = b"",
         endian: Literal["little", "big"] = "little",
     ):
-        super().__init__(initial_buffer)
-        self.endian: Literal["little", "big"] = endian
+        self._internal_reader = io.BytesIO(initial_buffer)
 
-    def read_integer(self, length: int, signed=False) -> int:
-        return int.from_bytes(self.read(length), self.endian, signed=signed)
+        self.endian: Literal["little", "big"] = endian
+        self.endian_sign: Literal["<", ">"] = "<" if endian == "little" else ">"
+
+    def seek(self, position: int) -> None:
+        self._internal_reader.seek(position)
+
+    def tell(self) -> int:
+        return self._internal_reader.tell()
+
+    def read(self, size: int) -> bytes:
+        return self._internal_reader.read(size)
 
     def read_uchar(self) -> int:
-        return self.read_integer(1)
+        return struct.unpack("B", self.read(1))[0]
 
     def read_char(self) -> int:
-        return self.read_integer(1, True)
+        return struct.unpack("b", self.read(1))[0]
 
     def read_ushort(self) -> int:
-        return self.read_integer(2)
+        return struct.unpack(f"{self.endian_sign}H", self.read(2))[0]
 
     def read_short(self) -> int:
-        return self.read_integer(2, True)
+        return struct.unpack(f"{self.endian_sign}h", self.read(2))[0]
 
     def read_uint(self) -> int:
-        return self.read_integer(4)
+        return struct.unpack(f"{self.endian_sign}I", self.read(4))[0]
 
     def read_int(self) -> int:
-        return self.read_integer(4, True)
+        return struct.unpack(f"{self.endian_sign}i", self.read(4))[0]
 
     def read_twip(self) -> float:
         return self.read_int() / 20
@@ -72,6 +81,7 @@ class Writer(io.BytesIO):
         if string is None:
             self.write_byte(0xFF)
             return
+
         encoded = string.encode()
         self.write_byte(len(encoded))
         self.write(encoded)

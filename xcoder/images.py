@@ -135,9 +135,9 @@ def load_texture(reader: Reader, pixel_type: int, width: int, height: int) -> No
         pixel_buffer.write(channel_count.to_bytes(1, "little"))
 
         for y in range(height):
-            for x in range(width):
-                pixel = read_pixel(reader)
-                pixel_buffer.write(bytearray(pixel))
+            pixel_buffer.write(
+                b"".join([bytearray(read_pixel(reader)) for _ in range(width)])
+            )
 
             Console.progress_bar(locale.crt_pic, y, height)
 
