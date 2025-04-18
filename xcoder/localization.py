@@ -124,8 +124,6 @@ class Locale:
     def change(self):
         language_files = os.listdir(_LOCALES_DIRECTORY)
 
-        print("Select Language\nВыберите язык\nВиберіть Мову\n")
-
         for file_index, language_file in enumerate(language_files):
             language_path = _LOCALES_DIRECTORY / language_file
             language_name = json.load(open(language_path, encoding="utf-8"))["name"]
