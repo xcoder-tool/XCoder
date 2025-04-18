@@ -37,8 +37,7 @@ class Console:
 
 
 if __name__ == "__main__":
-    console = Console()
-    console.ask_integer("Please, type any integer")
+    Console.ask_integer("Please, type any integer")
 
     for i in range(1000):
-        console.progress_bar("Test progress bar", i, 1000)
+        Console.progress_bar("Test progress bar", i, 1000)

@@ -37,26 +37,29 @@ def can_use_pvr_tex_tool() -> bool:
     return _cli_path is not None
 
 
+# noinspection PyTypeChecker
 def get_image_from_ktx_data(data: bytes) -> Image.Image:
-    tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".ktx")
-    try:
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".ktx") as tmp:
         tmp.write(data)
-    finally:
-        tmp.close()
 
-    image = get_image_from_ktx(Path(tmp.name))
-    os.remove(tmp.name)
+    try:
+        image = get_image_from_ktx(Path(tmp.name))
+    finally:
+        os.remove(tmp.name)
 
     return image
 
 
+# noinspection PyTypeChecker
 def get_image_from_ktx(filepath: Path) -> Image.Image:
     png_filepath = convert_ktx_to_png(filepath)
     image_open = Image.open(png_filepath)
-    image = image_open.copy()
-    image_open.close()
-    os.remove(png_filepath)
-    return image
+
+    try:
+        return image_open.copy()
+    finally:
+        image_open.close()
+        os.remove(png_filepath)
 
 
 def convert_ktx_to_png(filepath: Path, output_folder: Path | None = None) -> Path:
