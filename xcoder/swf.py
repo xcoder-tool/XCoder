@@ -163,16 +163,14 @@ class SupercellSWF:
 
                 if has_texture:
                     logger.info(
-                        locale.about_sc
-                        % (
-                            self.filename,
-                            texture_id,
-                            texture.pixel_type,
-                            texture.width,
-                            texture.height,
+                        locale.about_sc.format(
+                            filename=self.filename,
+                            index=texture_id,
+                            pixel_type=texture.pixel_type,
+                            width=texture.width,
+                            height=texture.height,
                         )
                     )
-                    print()
 
                     self.xcod_writer.write_ubyte(tag)
                     self.xcod_writer.write_ubyte(texture.pixel_type)

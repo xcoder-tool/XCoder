@@ -27,7 +27,7 @@ def get_run_output(command: str):
 
 def get_pip_info(outdated: bool = False) -> list:
     output = get_run_output(
-        f'pip --disable-pip-version-check list {"-o" if outdated else ""}'
+        f"pip --disable-pip-version-check list {'-o' if outdated else ''}"
     )
     output = output.splitlines()
     output = output[2:]

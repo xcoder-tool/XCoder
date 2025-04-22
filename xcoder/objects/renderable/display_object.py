@@ -14,12 +14,10 @@ class DisplayObject(ABC):
         self._color_transform = ColorTransform()
 
     @abstractmethod
-    def calculate_bounds(self, matrix: Matrix2x3) -> Rect:
-        ...
+    def calculate_bounds(self, matrix: Matrix2x3) -> Rect: ...
 
     @abstractmethod
-    def render(self, matrix: Matrix2x3) -> Image.Image:
-        ...
+    def render(self, matrix: Matrix2x3) -> Image.Image: ...
 
     def set_matrix(self, matrix: Matrix2x3):
         self._matrix = matrix

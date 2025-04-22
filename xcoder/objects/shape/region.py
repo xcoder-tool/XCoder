@@ -93,7 +93,7 @@ class Region:
         height = max(int(rect.height), 1)
         if width + height <= 2:  # The same speed as without this return
             return Image.new(
-                "RGBA",
+                self._texture.image.mode,
                 (1, 1),
                 color=self._texture.image.getpixel((int(rect.left), int(rect.top))),
             )
@@ -102,12 +102,13 @@ class Region:
             "L", self._texture.width, self._texture.height, self._uv_points, 0xFF
         )
 
-        rendered_region = Image.new("RGBA", (width, height))
+        rendered_region = Image.new(self._texture.image.mode, (width, height))
         rendered_region.paste(
             self._texture.image.crop(rect.as_tuple()),
             (0, 0),
             mask_image.crop(rect.as_tuple()),
         )
+        rendered_region = rendered_region.convert("RGBA")
 
         self._cache_image = rendered_region
 

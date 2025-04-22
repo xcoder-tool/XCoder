@@ -54,7 +54,7 @@
 
   "not_latest": "安装的不是最新版本",
   "collecting_inf": "文件：%s。正在收集信息...",
-  "about_sc": "关于纹理。文件名：%s (%d)，像素类型：%d，尺寸：%sx%s",
+  "about_sc": "关于纹理。文件名：{filename} ({index})，像素类型：{pixel_type}，尺寸：{width}x{height}",
   "decompression_error": "解压时出错！尝试直接解码...",
   "skip_not_installed": "%s 未安装！请重新初始化",
   "detected_comp": "检测到 %s 压缩",

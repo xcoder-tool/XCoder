@@ -23,7 +23,7 @@ def check_auto_update():
 
 def check_files_updated():
     if config.has_update:
-        logger.opt(colors=True).info(f'<green>{locale.update_done % ""}</green>')
+        logger.opt(colors=True).info(f"<green>{locale.update_done % ''}</green>")
         if Console.question(locale.done_qu):
             latest_tag = get_tags(config.repo_owner, config.repo_name)[0]
             latest_tag_name = latest_tag["name"][1:]

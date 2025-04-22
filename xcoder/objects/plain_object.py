@@ -9,5 +9,4 @@ if TYPE_CHECKING:
 
 class PlainObject(ABC):
     @abstractmethod
-    def load(self, swf: SupercellSWF, tag: int):
-        ...
+    def load(self, swf: SupercellSWF, tag: int): ...

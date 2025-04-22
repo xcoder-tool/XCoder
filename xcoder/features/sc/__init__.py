@@ -42,7 +42,13 @@ def compile_sc(
         file_size = width * height * pixel_size + 5
 
         logger.info(
-            locale.about_sc % (file_info.name, picture_index, pixel_type, width, height)
+            locale.about_sc.format(
+                filename=file_info.name,
+                index=picture_index,
+                pixel_type=pixel_type,
+                width=width,
+                height=height,
+            )
         )
 
         sc.write(struct.pack("<BIBHH", file_type, file_size, pixel_type, width, height))
