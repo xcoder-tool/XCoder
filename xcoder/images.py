@@ -6,12 +6,12 @@ from PIL import Image, ImageDraw
 if TYPE_CHECKING:
     from PIL._imaging import PixelAccess  # type: ignore[reportPrivateImportUsage]
 
-from .bytestream import Reader, Writer
-from .console import Console
-from .localization import locale
-from .math.point import Point
-from .matrices import Matrix2x3
-from .pixel_utils import get_pixel_encode_function, get_raw_mode
+from xcoder.bytestream import Reader, Writer
+from xcoder.console import Console
+from xcoder.localization import locale
+from xcoder.math.point import Point
+from xcoder.matrices import Matrix2x3
+from xcoder.pixel_utils import get_pixel_encode_function, get_raw_mode
 
 CHUNK_SIZE = 32
 
@@ -47,11 +47,11 @@ def join_image(
     raw_mode = get_raw_mode(pixel_type)
 
     for chunk_index in range(chunk_count):
-        chunk_x = chunk_index % chunk_count_x
-        chunk_y = chunk_index // chunk_count_x
+        chunk_x = (chunk_index % chunk_count_x) * CHUNK_SIZE
+        chunk_y = (chunk_index // chunk_count_x) * CHUNK_SIZE
 
-        chunk_width = min(width - chunk_x * CHUNK_SIZE, CHUNK_SIZE)
-        chunk_height = min(height - chunk_y * CHUNK_SIZE, CHUNK_SIZE)
+        chunk_width = min(width - chunk_x, CHUNK_SIZE)
+        chunk_height = min(height - chunk_y, CHUNK_SIZE)
 
         sub_image = Image.frombuffer(
             mode,
@@ -63,7 +63,7 @@ def join_image(
             1,
         )
 
-        image.paste(sub_image, (chunk_x * CHUNK_SIZE, chunk_y * CHUNK_SIZE))
+        image.paste(sub_image, (chunk_x, chunk_y))
 
         Console.progress_bar(locale.join_pic, chunk_index, chunk_count)
 
@@ -76,40 +76,33 @@ def _add_pixel(
     image[pixel_index % width, int(pixel_index / width)] = color
 
 
-def split_image(img: Image.Image) -> None:
-    width, height = img.size
+def split_image(image: Image.Image) -> Image.Image:
+    width, height = image.size
 
-    loaded_image = img.load()
-    if loaded_image is None:
-        raise Exception("loaded_image is None")
+    chunk_count_x = math.ceil(width / CHUNK_SIZE)
+    chunk_count_y = math.ceil(height / CHUNK_SIZE)
+    chunk_count = chunk_count_x * chunk_count_y
 
-    loaded_clone = img.copy().load()
-    if loaded_clone is None:
-        raise Exception("loaded_clone is None")
+    split_image_buffers = []
 
-    x_chunks_count = width // CHUNK_SIZE
-    y_chunks_count = height // CHUNK_SIZE
+    for chunk_index in range(chunk_count):
+        chunk_x = (chunk_index % chunk_count_x) * CHUNK_SIZE
+        chunk_y = (chunk_index // chunk_count_x) * CHUNK_SIZE
 
-    pixel_index = 0
+        chunk_width = min(width - chunk_x, CHUNK_SIZE)
+        chunk_height = min(height - chunk_y, CHUNK_SIZE)
 
-    for y_chunk in range(y_chunks_count + 1):
-        for x_chunk in range(x_chunks_count + 1):
-            for y in range(CHUNK_SIZE):
-                pixel_y = (y_chunk * CHUNK_SIZE) + y
-                if pixel_y >= height:
-                    break
+        chunk = image.crop(
+            (chunk_x, chunk_y, chunk_x + chunk_width, chunk_y + chunk_height)
+        )
 
-                for x in range(CHUNK_SIZE):
-                    pixel_x = (x_chunk * CHUNK_SIZE) + x
-                    if pixel_x >= width:
-                        break
+        split_image_buffers.append(chunk.tobytes("raw"))
 
-                    _add_pixel(
-                        loaded_image, pixel_index, width, loaded_clone[pixel_x, pixel_y]
-                    )
-                    pixel_index += 1
+        Console.progress_bar(locale.split_pic, chunk_index, chunk_count)
 
-        Console.progress_bar(locale.split_pic, y_chunk, y_chunks_count + 1)
+    return Image.frombuffer(
+        image.mode, image.size, b"".join(split_image_buffers), "raw"
+    )
 
 
 def get_byte_count_by_pixel_type(pixel_type: int) -> int:
@@ -146,7 +139,7 @@ def save_texture(writer: Writer, image: Image.Image, pixel_type: int) -> None:
     # Some packers for raw_encoder are absent
     # https://github.com/python-pillow/Pillow/blob/58e48745cc7b6c6f7dd26a50fe68d1a82ea51562/src/encode.c#L337
     # https://github.com/python-pillow/Pillow/blob/main/src/libImaging/Pack.c#L668
-    if raw_mode != image.mode:
+    if raw_mode != image.mode and encode_pixel is not None:
         for y in range(height):
             for x in range(width):
                 # noinspection PyTypeChecker
