@@ -54,7 +54,7 @@ def compile_sc(
         sc.write(struct.pack("<BIBHH", file_type, file_size, pixel_type, width, height))
 
         if file_type in (27, 28):
-            split_image(sheet)
+            sheet = split_image(sheet)
 
         save_texture(sc, sheet, pixel_type)
         print()

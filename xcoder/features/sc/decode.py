@@ -38,10 +38,8 @@ def decode_textures_only():
                 output_folder, base_name
             )
 
-            _save_meta_file(
-                swf, objects_output_folder, base_name.rsplit("_", 1)[0], signature
-            )
             _save_textures(swf, objects_output_folder, base_name)
+            _save_meta_file(swf, objects_output_folder, base_name, signature)
         except Exception as exception:
             logger.exception(
                 locale.error
@@ -77,8 +75,8 @@ def decode_and_render_objects():
                 output_folder, base_name
             )
 
-            _save_textures(swf, objects_output_folder / "textures", base_name)
             render_objects(swf, objects_output_folder)
+            _save_textures(swf, objects_output_folder / "textures", base_name)
             _save_meta_file(swf, objects_output_folder, base_name, signature)
         except Exception as exception:
             logger.exception(
