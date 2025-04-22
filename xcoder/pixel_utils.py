@@ -57,25 +57,13 @@ def _write_rgb565(pixel: PixelChannels) -> bytes:
     return struct.pack("<H", b >> 3 | g >> 2 << 5 | r >> 3 << 11)
 
 
-def _write_luminance8_alpha8(pixel: PixelChannels) -> bytes:
-    return struct.pack("2B", *pixel[::-1])
-
-
-def _write_luminance8(pixel: PixelChannels) -> bytes:
-    return struct.pack("B", pixel)
-
-
 _encode_functions: dict[int, EncodeFunction] = {
-    0: _write_rgba8,
-    1: _write_rgba8,
     2: _write_rgba4,
     3: _write_rgb5a1,
     4: _write_rgb565,
-    6: _write_luminance8_alpha8,
-    10: _write_luminance8,
 }
 
-# here is a problem with this names https://github.com/python-pillow/Pillow/pull/8158
+# here is a problem with these names https://github.com/python-pillow/Pillow/pull/8158
 _raw_modes: dict[int, RawMode] = {
     0: "RGBA",
     1: "RGBA",
