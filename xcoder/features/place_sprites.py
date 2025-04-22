@@ -79,7 +79,7 @@ def place_sprites(
             bbox = int(rect.left), int(rect.top), int(rect.right), int(rect.bottom)
 
             region_image = Image.open(
-                f'{folder}{"/overwrite" if overwrite else ""}/{filename}'
+                f"{folder}{'/overwrite' if overwrite else ''}/{filename}"
             ).convert("RGBA")
 
             sheets[region_info.texture_id].paste(

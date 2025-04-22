@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-import os
 from typing import TYPE_CHECKING
 
 import zstandard
 from PIL import Image
 
-from xcoder.images import join_image, load_image_from_buffer, load_texture
+from xcoder.bytestream import Reader
+from xcoder.images import join_image, load_image_from_buffer
 from xcoder.pvr_tex_tool import get_image_from_ktx_data
 
 if TYPE_CHECKING:
@@ -54,14 +54,10 @@ class SWFTexture:
             )
             return
 
-        try:
-            load_texture(swf.reader, self.pixel_type, self.width, self.height)
+        self.image = self._load_texture(swf.reader, tag)
 
-            if tag in (27, 28, 29):
-                image = join_image(self.pixel_type, self.width, self.height)
-            else:
-                image = load_image_from_buffer(self.pixel_type, self.width, self.height)
-        finally:
-            os.remove("pixel_buffer")
+    def _load_texture(self, reader: Reader, tag: int) -> Image.Image:
+        if tag in (27, 28, 29):
+            return join_image(self.pixel_type, self.width, self.height, reader)
 
-        self.image = image
+        return load_image_from_buffer(self.pixel_type, self.width, self.height, reader)

@@ -1,15 +1,18 @@
 import struct
-from typing import Callable, TypeAlias
+from typing import Callable, Literal, TypeAlias
 
-from xcoder.bytestream import Reader
+from xcoder.localization import locale
 
 PixelChannels: TypeAlias = tuple[int, ...]
 EncodeFunction: TypeAlias = Callable[[PixelChannels], bytes]
-DecodeFunction: TypeAlias = Callable[[Reader], PixelChannels]
+RawMode: TypeAlias = Literal["RGBA", "RGBA;4B", "RGBA;15", "BGR;16", "LA", "L"]
 
 
-def get_read_function(pixel_type: int) -> DecodeFunction | None:
-    return _decode_functions.get(pixel_type, None)
+def get_raw_mode(pixel_type: int) -> RawMode:
+    if pixel_type in _raw_modes:
+        return _raw_modes[pixel_type]
+
+    raise Exception(locale.unknown_pixel_type % pixel_type)
 
 
 def get_pixel_encode_function(pixel_type: int) -> EncodeFunction | None:
@@ -24,43 +27,6 @@ def get_channel_count_by_pixel_type(pixel_type: int) -> int:
     elif pixel_type == 10:
         return 1
     return 4
-
-
-def _read_rgba8(reader: Reader) -> PixelChannels:
-    return tuple(reader.read(4))
-
-
-def _read_rgba4(reader: Reader) -> PixelChannels:
-    p = reader.read_ushort()
-    return (
-        (p >> 12 & 15) << 4,
-        (p >> 8 & 15) << 4,
-        (p >> 4 & 15) << 4,
-        (p >> 0 & 15) << 4,
-    )
-
-
-def _read_rgb5a1(reader: Reader) -> PixelChannels:
-    p = reader.read_ushort()
-    return (
-        (p >> 11 & 31) << 3,
-        (p >> 6 & 31) << 3,
-        (p >> 1 & 31) << 3,
-        (p & 255) << 7,
-    )
-
-
-def _read_rgb565(reader: Reader) -> PixelChannels:
-    p = reader.read_ushort()
-    return (p >> 11 & 31) << 3, (p >> 5 & 63) << 2, (p & 31) << 3
-
-
-def _read_luminance8_alpha8(reader: Reader) -> PixelChannels:
-    return tuple(reader.read(2))[::-1]
-
-
-def _read_luminance8(reader: Reader) -> PixelChannels:
-    return tuple(reader.read(1))
 
 
 def _write_rgba8(pixel: PixelChannels) -> bytes:
@@ -109,12 +75,13 @@ _encode_functions: dict[int, EncodeFunction] = {
     10: _write_luminance8,
 }
 
-_decode_functions: dict[int, DecodeFunction] = {
-    0: _read_rgba8,
-    1: _read_rgba8,
-    2: _read_rgba4,
-    3: _read_rgb5a1,
-    4: _read_rgb565,
-    6: _read_luminance8_alpha8,
-    10: _read_luminance8,
+# here is a problem with this names https://github.com/python-pillow/Pillow/pull/8158
+_raw_modes: dict[int, RawMode] = {
+    0: "RGBA",
+    1: "RGBA",
+    2: "RGBA;4B",  # ABGR;4
+    3: "RGBA;15",  # ABGR;1555
+    4: "BGR;16",  # RGB;565
+    6: "LA",
+    10: "L",
 }

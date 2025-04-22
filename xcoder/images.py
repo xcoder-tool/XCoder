@@ -11,51 +11,61 @@ from .console import Console
 from .localization import locale
 from .math.point import Point
 from .matrices import Matrix2x3
-from .pixel_utils import (
-    get_channel_count_by_pixel_type,
-    get_pixel_encode_function,
-    get_read_function,
-)
+from .pixel_utils import get_pixel_encode_function, get_raw_mode
 
 CHUNK_SIZE = 32
 
 
-def load_image_from_buffer(pixel_type: int, width: int, height: int) -> Image.Image:
-    with open("pixel_buffer", "rb") as pixel_buffer:
-        pixel_buffer.read(1)
+def load_image_from_buffer(
+    pixel_type: int, width: int, height: int, pixel_buffer: Reader
+) -> Image.Image:
+    raw_mode = get_raw_mode(pixel_type)
+    bytes_per_pixel = get_byte_count_by_pixel_type(pixel_type)
 
-        return Image.frombuffer(
-            get_format_by_pixel_type(pixel_type), (width, height), pixel_buffer.read()
-        )
+    return Image.frombuffer(
+        get_format_by_pixel_type(pixel_type),
+        (width, height),
+        pixel_buffer.read(width * height * bytes_per_pixel),
+        "raw",
+        raw_mode,
+        0,
+        1,
+    )
 
 
-def join_image(pixel_type: int, width: int, height: int) -> Image.Image:
+def join_image(
+    pixel_type: int, width: int, height: int, pixel_buffer: Reader
+) -> Image.Image:
     mode = get_format_by_pixel_type(pixel_type)
+    bytes_per_pixel = get_byte_count_by_pixel_type(pixel_type)
     image = Image.new(mode, (width, height))
 
-    with open("pixel_buffer", "rb") as pixel_buffer:
-        channel_count = int.from_bytes(pixel_buffer.read(1), "little")
+    chunk_count_x = math.ceil(width / CHUNK_SIZE)
+    chunk_count_y = math.ceil(height / CHUNK_SIZE)
+    chunk_count = chunk_count_x * chunk_count_y
 
-        chunk_count_x = math.ceil(width / CHUNK_SIZE)
-        chunk_count_y = math.ceil(height / CHUNK_SIZE)
-        chunk_count = chunk_count_x * chunk_count_y
+    raw_mode = get_raw_mode(pixel_type)
 
-        for chunk_index in range(chunk_count):
-            chunk_x = chunk_index % chunk_count_x
-            chunk_y = chunk_index // chunk_count_x
+    for chunk_index in range(chunk_count):
+        chunk_x = chunk_index % chunk_count_x
+        chunk_y = chunk_index // chunk_count_x
 
-            chunk_width = min(width - chunk_x * CHUNK_SIZE, CHUNK_SIZE)
-            chunk_height = min(height - chunk_y * CHUNK_SIZE, CHUNK_SIZE)
+        chunk_width = min(width - chunk_x * CHUNK_SIZE, CHUNK_SIZE)
+        chunk_height = min(height - chunk_y * CHUNK_SIZE, CHUNK_SIZE)
 
-            sub_image = Image.frombuffer(
-                mode,
-                (chunk_width, chunk_height),
-                pixel_buffer.read(channel_count * chunk_width * chunk_height),
-            )
+        sub_image = Image.frombuffer(
+            mode,
+            (chunk_width, chunk_height),
+            pixel_buffer.read(bytes_per_pixel * chunk_width * chunk_height),
+            "raw",
+            raw_mode,
+            0,
+            1,
+        )
 
-            image.paste(sub_image, (chunk_x * CHUNK_SIZE, chunk_y * CHUNK_SIZE))
+        image.paste(sub_image, (chunk_x * CHUNK_SIZE, chunk_y * CHUNK_SIZE))
 
-            Console.progress_bar(locale.join_pic, chunk_index, chunk_count)
+        Console.progress_bar(locale.join_pic, chunk_index, chunk_count)
 
     return image
 
@@ -123,23 +133,6 @@ def get_format_by_pixel_type(pixel_type: int) -> str:
         return "L"
 
     raise Exception(locale.unknown_pixel_type % pixel_type)
-
-
-def load_texture(reader: Reader, pixel_type: int, width: int, height: int) -> None:
-    channel_count = get_channel_count_by_pixel_type(pixel_type)
-    read_pixel = get_read_function(pixel_type)
-    if read_pixel is None:
-        raise Exception(locale.unknown_pixel_type % pixel_type)
-
-    with open("pixel_buffer", "wb") as pixel_buffer:
-        pixel_buffer.write(channel_count.to_bytes(1, "little"))
-
-        for y in range(height):
-            pixel_buffer.write(
-                b"".join([bytearray(read_pixel(reader)) for _ in range(width)])
-            )
-
-            Console.progress_bar(locale.crt_pic, y, height)
 
 
 def save_texture(writer: Writer, image: Image.Image, pixel_type: int) -> None:
