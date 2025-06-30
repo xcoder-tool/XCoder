@@ -18,7 +18,7 @@ loguru = "0.7.3"
 [tool.poetry.group.dev.dependencies]
 pyright = "^1.1.376"
 black = "^24.8.0"
-pre-commit = "^3.8.0"
+pre-commit = "^4.2.0"
 ruff = "^0.11.2"
 
 [build-system]
