@@ -16,7 +16,7 @@ dependencies = [
     "sc-compression==0.6.6",
     "colorama==0.4.6",
     "zstandard>=0.23.0,<0.24",
-    "pillow~=11.2.1",
+    "pillow~=12.1.0",
     "loguru==0.7.3",
 ]
 
