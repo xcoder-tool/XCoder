@@ -1,16 +1,12 @@
 import time
 
-from xcoder.config import config
-from xcoder.localization import locale
-from xcoder.main_menu import check_auto_update, check_files_updated, menu, refill_menu
-
-try:
-    from loguru import logger
-except ImportError:
-    raise RuntimeError("Please, install loguru using pip")
+from loguru import logger
 
 from xcoder import clear
+from xcoder.config import config
 from xcoder.features.initialization import initialize
+from xcoder.localization import locale
+from xcoder.main_menu import check_auto_update, check_files_updated, menu, refill_menu
 
 
 def main():
@@ -26,9 +22,13 @@ def main():
 
     refill_menu()
 
-    while True:
-        handler = menu.choice()
-        if handler is not None:
+    interrupted = False
+    while not interrupted:
+        try:
+            handler = menu.choice()
+            if handler is None:
+                continue
+
             start_time = time.time()
             with logger.catch():
                 handler()
@@ -36,11 +36,13 @@ def main():
                 f"<green>{locale.done % (time.time() - start_time)}</green>"
             )
             input(locale.to_continue)
-        clear()
+        except KeyboardInterrupt:
+            interrupted = True
+        finally:
+            clear()
+
+    logger.info("Exit.")
 
 
 if __name__ == "__main__":
-    try:
-        main()
-    except KeyboardInterrupt:
-        logger.info("Exit.")
+    main()

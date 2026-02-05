@@ -10,7 +10,7 @@
 /SC/
 
 # Configuration files
-xcoder/config.json
+config.json
 
 # Python compiled files
 *.pyc

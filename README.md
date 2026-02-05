@@ -16,7 +16,7 @@ formats across all Supercell games.
 
 **Windows**:
 
-1. Download Python 3.10 or newer version from
+1. Download Python 3.11 or newer version from
    the [official page](https://www.python.org/downloads/)
 2. Install Python. While Installing, enable such parameters as "Add Python to
    PATH", "Install pip", "Install py launcher", "Associate files with Python" and "Add
@@ -35,11 +35,13 @@ formats across all Supercell games.
    the [releases page](https://github.com/xcoder-tool/XCoder/releases) and extract it
 2. Go to the extracted directory and install required modules by executing:
     ```sh
-    poetry install
+    uv install .  # or
+    pip install .
     ```
 3. Run program with
     ```sh
-    poetry run python -m xcoder
+    uv run python -m xcoder  # or
+    xcoder
     ```
 
 ### How to enable KTX section

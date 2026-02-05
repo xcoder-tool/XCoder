@@ -7,32 +7,23 @@ jobs:
     runs-on: ${{matrix.os}}
     strategy:
       matrix:
-        python: ["3.11", "3.12"]
+        python: ["3.11", "3.12", "3.13"]
         os: ["ubuntu-latest", "windows-latest"]
     
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python ${{matrix.python}}
-        uses: actions/setup-python@v4
+      - name: Install the latest version of uv with Python ${{matrix.python}}
+        uses: astral-sh/setup-uv@v7
         with:
           python-version: ${{matrix.python}}
 
-      - name: Install poetry
-        run: |
-          pip install pipx
-          pipx install poetry
-
-      - name: Install dependencies
-        run: |
-          poetry install
-
       - name: Linting code by ruff
         run: |
-          poetry run ruff check .
+          uv run ruff check .
 
       - name: Check types by pyright
         run: |
-          poetry run pyright .
+          uv run pyright .
 
       - name: Run unit-tests
-        run: poetry run python -m unittest
+        run: uv run python -m unittest
