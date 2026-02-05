@@ -3,7 +3,8 @@ import os
 from pathlib import Path
 from typing import LiteralString
 
-_LIBRARY_DIRECTORY = Path(__file__).parent
+# ./src/xcoder/config.py
+_PROJECT_DIRECTORY = Path(__file__).parent.parent.parent
 
 
 class Config:
@@ -12,7 +13,7 @@ class Config:
     REPO_OWNER: LiteralString = "xcoder-tool"
     REPO_NAME: LiteralString = "xcoder"
 
-    config_path = _LIBRARY_DIRECTORY / "config.json"
+    config_path = _PROJECT_DIRECTORY / "config.json"
 
     def __init__(self):
         self.config_items = (
