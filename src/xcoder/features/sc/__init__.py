@@ -1,8 +1,8 @@
-import struct
 from pathlib import Path
+import struct
 
-from loguru import logger
 from PIL import Image
+from loguru import logger
 
 from xcoder.bytestream import Writer
 from xcoder.console import Console

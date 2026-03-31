@@ -113,13 +113,13 @@ def refill_menu():
                 )
             )
 
+            from ktx import KtxTool
             from xcoder.features.ktx import (
                 convert_ktx_textures_to_png,
                 convert_png_textures_to_ktx,
             )
-            from xcoder.pvr_tex_tool import can_use_pvr_tex_tool
 
-            if can_use_pvr_tex_tool():
+            if KtxTool.is_available():
                 ktx_category.add(
                     Menu.Item(
                         name=locale.png_from_ktx_label,

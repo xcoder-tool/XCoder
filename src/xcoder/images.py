@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 from PIL import Image, ImageDraw
 
 if TYPE_CHECKING:
-    from PIL._imaging import PixelAccess  # type: ignore[reportPrivateImportUsage]
+    from PIL._imaging import PixelAccess
 
 from xcoder.bytestream import Reader, Writer
 from xcoder.console import Console

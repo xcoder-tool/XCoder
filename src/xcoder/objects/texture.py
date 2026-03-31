@@ -2,12 +2,12 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import zstandard
 from PIL import Image
+import zstandard
 
+from ktx import get_image_from_ktx_data
 from xcoder.bytestream import Reader
 from xcoder.images import join_image, load_image_from_buffer
-from xcoder.pvr_tex_tool import get_image_from_ktx_data
 
 if TYPE_CHECKING:
     from xcoder.swf import SupercellSWF
