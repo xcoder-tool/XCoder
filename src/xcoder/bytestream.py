@@ -56,28 +56,33 @@ class Writer(io.BytesIO):
         super().__init__()
         self._endian: Literal["little", "big"] = endian
 
-    def write_int(self, integer: int, length: int = 1, signed: bool = False):
+    def write_tagged(self, tag: int, data: bytes) -> None:
+        self.write_ubyte(tag)
+        self.write_uint32(len(data))
+        self.write(data)
+
+    def write_int(self, integer: int, length: int = 1, signed: bool = False) -> None:
         self.write(integer.to_bytes(length, self._endian, signed=signed))
 
-    def write_ubyte(self, integer: int):
+    def write_ubyte(self, integer: int) -> None:
         self.write_int(integer)
 
-    def write_byte(self, integer: int):
+    def write_byte(self, integer: int) -> None:
         self.write_int(integer, signed=True)
 
-    def write_uint16(self, integer: int):
+    def write_uint16(self, integer: int) -> None:
         self.write_int(integer, 2)
 
-    def write_int16(self, integer: int):
+    def write_int16(self, integer: int) -> None:
         self.write_int(integer, 2, True)
 
-    def write_uint32(self, integer: int):
+    def write_uint32(self, integer: int) -> None:
         self.write_int(integer, 4)
 
-    def write_int32(self, integer: int):
+    def write_int32(self, integer: int) -> None:
         self.write_int(integer, 4, True)
 
-    def write_string(self, string: str | None = None):
+    def write_string(self, string: str | None) -> None:
         if string is None:
             self.write_byte(0xFF)
             return

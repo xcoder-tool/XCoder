@@ -1,8 +1,8 @@
 import os
 from pathlib import Path
 
-from loguru import logger
 from PIL import Image
+from loguru import logger
 
 from xcoder.features.place_sprites import place_sprites
 from xcoder.features.sc import compile_sc

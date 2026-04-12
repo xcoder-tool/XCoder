@@ -1,6 +1,6 @@
 import os
-import shutil
 from pathlib import Path
+import shutil
 
 from loguru import logger
 from sc_compression import Signatures

@@ -46,10 +46,10 @@ class Matrix2x3:
         self.x = reader.read_twip()
         self.y = reader.read_twip()
 
-    def apply_x(self, x: float, y: float):
+    def apply_x(self, x: float, y: float) -> float:
         return x * self.a + y * self.c + self.x
 
-    def apply_y(self, x: float, y: float):
+    def apply_y(self, x: float, y: float) -> float:
         return y * self.d + x * self.b + self.y
 
     def multiply(self, matrix: Self) -> Self:
@@ -86,5 +86,5 @@ class Matrix2x3:
 
         return scale_x, scale_y
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"Matrix2x3{self.a, self.b, self.c, self.d, self.x, self.y}"

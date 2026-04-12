@@ -172,6 +172,10 @@ class SupercellSWF:
                         )
                     )
 
+                    # Note: get rid of ktx texture tags
+                    if tag in (45, 47):
+                        tag = 34
+
                     self.xcod_writer.write_ubyte(tag)
                     self.xcod_writer.write_ubyte(texture.pixel_type)
                     self.xcod_writer.write_uint16(texture.width)

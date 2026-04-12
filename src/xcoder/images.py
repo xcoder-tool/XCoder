@@ -4,14 +4,14 @@ from typing import TYPE_CHECKING
 from PIL import Image, ImageDraw
 
 if TYPE_CHECKING:
-    from PIL._imaging import PixelAccess  # type: ignore[reportPrivateImportUsage]
+    from PIL._imaging import PixelAccess
 
-from xcoder.bytestream import Reader, Writer
+from xcoder.bytestream import Reader
 from xcoder.console import Console
 from xcoder.localization import locale
 from xcoder.math.point import Point
 from xcoder.matrices import Matrix2x3
-from xcoder.pixel_utils import get_pixel_encode_function, get_raw_mode
+from xcoder.pixel_utils import get_raw_mode
 
 CHUNK_SIZE = 32
 
@@ -126,31 +126,6 @@ def get_format_by_pixel_type(pixel_type: int) -> str:
         return "L"
 
     raise Exception(locale.unknown_pixel_type % pixel_type)
-
-
-def save_texture(writer: Writer, image: Image.Image, pixel_type: int) -> None:
-    raw_mode = get_raw_mode(pixel_type)
-    encode_pixel = get_pixel_encode_function(pixel_type)
-
-    width, height = image.size
-
-    pixels = image.getdata()
-
-    # Some packers for raw_encoder are absent
-    # https://github.com/python-pillow/Pillow/blob/58e48745cc7b6c6f7dd26a50fe68d1a82ea51562/src/encode.c#L337
-    # https://github.com/python-pillow/Pillow/blob/main/src/libImaging/Pack.c#L668
-    if raw_mode != image.mode and encode_pixel is not None:
-        for y in range(height):
-            for x in range(width):
-                # noinspection PyTypeChecker
-                writer.write(encode_pixel(pixels[y * width + x]))
-
-            Console.progress_bar(locale.writing_pic, y, height)
-
-        return
-
-    writer.write(image.tobytes("raw", raw_mode, 0, 1))
-    Console.progress_bar(locale.writing_pic, height - 1, height)
 
 
 def transform_image(

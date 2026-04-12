@@ -16,14 +16,11 @@ def place_sprites(
     file_info: FileInfo, folder: Path, overwrite: bool = False
 ) -> list[Image.Image]:
     files_to_overwrite = os.listdir(folder / ("overwrite" if overwrite else ""))
-    texture_files = os.listdir(folder / "textures")
 
-    sheets = []
-    for i in range(len(file_info.sheets)):
-        sheet_info = file_info.sheets[i]
-
+    sheets: list[Image.Image] = []
+    for i, sheet_info in enumerate(file_info.sheets):
         sheets.append(
-            Image.open(f"{folder}/textures/{texture_files[i]}")
+            Image.open(f"{folder}/textures/{folder.name}_{i}.png")
             if overwrite
             else Image.new(
                 get_format_by_pixel_type(sheet_info.pixel_type), sheet_info.size

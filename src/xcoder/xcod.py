@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-import os
 from dataclasses import dataclass
+import os
 from pathlib import Path
 
 from loguru import logger
@@ -73,7 +73,7 @@ def parse_base_info(file_info: FileInfo, reader: Reader) -> None:
     file_info.signature_version = 1 if reader.read_string() == "LZMA" else 3
 
     sheets_count = reader.read_uchar()
-    for i in range(sheets_count):
+    for _i in range(sheets_count):
         file_type = reader.read_uchar()
         pixel_type = reader.read_uchar()
         width = reader.read_ushort()
@@ -84,13 +84,13 @@ def parse_base_info(file_info: FileInfo, reader: Reader) -> None:
 
 def parse_detailed_info(file_info: FileInfo, reader: Reader) -> None:
     shapes_count = reader.read_ushort()
-    for shape_index in range(shapes_count):
+    for _shape_index in range(shapes_count):
         shape_id = reader.read_ushort()
 
         regions = []
 
         regions_count = reader.read_ushort()
-        for region_index in range(regions_count):
+        for _region_index in range(regions_count):
             texture_id, points_count = reader.read_uchar(), reader.read_uchar()
 
             points = [
