@@ -1,28 +1,38 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TypeAlias
 
 from PIL import Image
 import zstandard
 
 from ktx import get_image_from_ktx_data
-from xcoder.bytestream import Reader
-from xcoder.images import join_image, load_image_from_buffer
+from xcoder.bytestream import Reader, Writer
+from xcoder.console import Console
+from xcoder.images import join_image, load_image_from_buffer, split_image
+from xcoder.localization import locale
+from xcoder.pixel_utils import get_pixel_encode_function, get_raw_mode
 
 if TYPE_CHECKING:
     from xcoder.swf import SupercellSWF
 
 
-class SWFTexture:
-    def __init__(self):
-        self.width = 0
-        self.height = 0
+PixelType: TypeAlias = int
 
-        self.pixel_type = -1
+_interleaved_tags = (27, 28, 29)
+
+
+class SWFTexture:
+    def __init__(
+        self, *, width: int = 0, height: int = 0, pixel_type: PixelType = -1
+    ) -> None:
+        self.width: int = width
+        self.height: int = height
+
+        self.pixel_type: PixelType = pixel_type
 
         self.image: Image.Image | None = None
 
-    def load(self, swf: SupercellSWF, tag: int, has_texture: bool):
+    def load(self, swf: SupercellSWF, tag: int, has_texture: bool) -> None:
         assert swf.reader is not None
 
         khronos_texture_length = 0
@@ -56,8 +66,44 @@ class SWFTexture:
 
         self.image = self._load_texture(swf.reader, tag)
 
+    def save(self, writer: Writer, tag: int, has_texture: bool) -> None:
+        writer.write_ubyte(self.pixel_type)
+        writer.write_uint16(self.width)
+        writer.write_uint16(self.height)
+
+        if not has_texture:
+            return
+
+        assert self.image is not None
+        image = self.image
+
+        if tag in _interleaved_tags:
+            image = split_image(self.image)
+
+        raw_mode = get_raw_mode(self.pixel_type)
+        encode_pixel = get_pixel_encode_function(self.pixel_type)
+
+        width, height = image.size
+
+        pixels = image.getdata()
+
+        # Note: Some packers for raw_encoder are absent
+        # https://github.com/python-pillow/Pillow/blob/58e48745cc7b6c6f7dd26a50fe68d1a82ea51562/src/encode.c#L337
+        # https://github.com/python-pillow/Pillow/blob/main/src/libImaging/Pack.c#L668
+        if raw_mode != image.mode and encode_pixel is not None:
+            for y in range(height):
+                for x in range(width):
+                    writer.write(encode_pixel(pixels[y * width + x]))  # type: ignore
+
+                Console.progress_bar(locale.writing_pic, y, height)
+
+            return
+
+        writer.write(image.tobytes("raw", raw_mode, 0, 1))
+        Console.progress_bar(locale.writing_pic, height - 1, height)
+
     def _load_texture(self, reader: Reader, tag: int) -> Image.Image:
-        if tag in (27, 28, 29):
+        if tag in _interleaved_tags:
             return join_image(self.pixel_type, self.width, self.height, reader)
 
         return load_image_from_buffer(self.pixel_type, self.width, self.height, reader)

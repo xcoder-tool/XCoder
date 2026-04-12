@@ -1,19 +1,22 @@
+from typing import ClassVar
+
+
 class Console:
-    previous_percentage: int = -1
+    _previous_percentage: ClassVar[int] = -1
 
     @classmethod
     def progress_bar(cls, message: str, current: int, total: int) -> None:
         percentage = (current + 1) * 100 // total
-        if percentage == cls.previous_percentage:
+        if percentage == cls._previous_percentage:
             return
 
         print(f"\r[{percentage}%] {message}", end="")
 
         if percentage == 100:
             print()
-            cls.previous_percentage = -1
+            cls._previous_percentage = -1
         else:
-            cls.previous_percentage = percentage
+            cls._previous_percentage = percentage
 
     @staticmethod
     def ask_integer(message: str):

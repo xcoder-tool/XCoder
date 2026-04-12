@@ -1,5 +1,5 @@
+from collections.abc import Sequence
 from pathlib import Path
-import struct
 
 from PIL import Image
 from loguru import logger
@@ -7,64 +7,62 @@ from loguru import logger
 from xcoder.bytestream import Writer
 from xcoder.console import Console
 from xcoder.features.files import write_sc
-from xcoder.images import get_byte_count_by_pixel_type, save_texture, split_image
 from xcoder.localization import locale
+from xcoder.objects import SWFTexture
 from xcoder.xcod import FileInfo
 
 
 def compile_sc(
     output_folder: Path,
     file_info: FileInfo,
-    sheets: list[Image.Image],
+    sheets: Sequence[Image.Image],
 ):
-    sc = Writer()
+    writer = Writer()
 
-    for picture_index in range(len(sheets)):
-        sheet_info = file_info.sheets[picture_index]
-        sheet = sheets[picture_index]
+    for i, image in enumerate(sheets):
+        sheet_info = file_info.sheets[i]
 
-        file_type = sheet_info.file_type
+        tag = sheet_info.file_type
         pixel_type = sheet_info.pixel_type
 
-        if sheet.size != sheet_info.size:
+        if image.size != sheet_info.size:
             logger.info(
                 locale.illegal_size
-                % (sheet_info.width, sheet_info.height, sheet.width, sheet.height)
+                % (sheet_info.width, sheet_info.height, image.width, image.height)
             )
 
             if Console.question(locale.resize_qu):
                 logger.info(locale.resizing)
-                sheet = sheet.resize(sheet_info.size, Image.Resampling.LANCZOS)
+                image = image.resize(sheet_info.size, Image.Resampling.LANCZOS)
 
-        width, height = sheet.size
-        pixel_size = get_byte_count_by_pixel_type(pixel_type)
-
-        file_size = width * height * pixel_size + 5
+        width, height = image.size
 
         logger.info(
             locale.about_sc.format(
                 filename=file_info.name,
-                index=picture_index,
+                index=i,
                 pixel_type=pixel_type,
                 width=width,
                 height=height,
             )
         )
 
-        sc.write(struct.pack("<BIBHH", file_type, file_size, pixel_type, width, height))
+        swf_texture = SWFTexture(width=width, height=height, pixel_type=pixel_type)
+        swf_texture.image = image
 
-        if file_type in (27, 28):
-            sheet = split_image(sheet)
+        texture_writer = Writer()
+        swf_texture.save(writer, tag, True)
 
-        save_texture(sc, sheet, pixel_type)
+        writer.write_tagged(tag, texture_writer.getvalue())
+
         print()
 
-    sc.write(bytes(5))
+    writer.write_tagged(0, b"")  # EOF tag
 
     logger.info(locale.compressing_with % file_info.signature.name.upper())
     write_sc(
         output_folder / f"{file_info.name}.sc",
-        sc.getvalue(),
+        writer.getvalue(),
         file_info.signature,
         file_info.signature_version,
     )
