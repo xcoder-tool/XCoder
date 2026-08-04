@@ -2,11 +2,11 @@ import os
 from pathlib import Path
 
 from PIL import Image
+from sc.images import create_filled_polygon_image, get_format_by_pixel_type
+from sc.math.polygon import get_rect
 
 from xcoder.console import Console
-from xcoder.images import create_filled_polygon_image, get_format_by_pixel_type
 from xcoder.localization import locale
-from xcoder.math.polygon import get_rect
 from xcoder.xcod import FileInfo
 
 MASK_COLOR = 255
@@ -27,12 +27,12 @@ def place_sprites(
             )
         )
 
-    shapes_count = len(file_info.shapes)
+    shape_count = len(file_info.shapes)
     for shape_index, shape_info in enumerate(file_info.shapes):
         Console.progress_bar(
-            locale.place_sprites_process % (shape_index + 1, shapes_count),
+            locale.place_sprites_process % (shape_index + 1, shape_count),
             shape_index,
-            shapes_count,
+            shape_count,
         )
 
         for region_index, region_info in enumerate(shape_info.regions):

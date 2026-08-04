@@ -1,55 +1,34 @@
 import os
 from pathlib import Path
 
+from sc import Matrix2x3, SupercellSWF
+
 from xcoder.config import config
 from xcoder.console import Console
 from xcoder.localization import locale
-from xcoder.matrices import Matrix2x3
-from xcoder.objects.renderable.renderable_factory import create_renderable_from_plain
-from xcoder.swf import SupercellSWF
+
+from ..renderable_objects import create_renderable_from_plain
 
 
-def render_objects(swf: SupercellSWF, output_folder: Path):
+def render_objects(swf: SupercellSWF, output_folder: Path) -> None:
     os.makedirs(output_folder / "overwrite", exist_ok=True)
     os.makedirs(output_folder / "shapes", exist_ok=True)
     os.makedirs(output_folder / "movie_clips", exist_ok=True)
 
-    shapes_count = len(swf.shapes)
+    shape_count = len(swf.shapes)
 
-    swf.xcod_writer.write_uint16(shapes_count)
-    for shape_index in range(shapes_count):
-        shape = swf.shapes[shape_index]
-
-        regions_count = len(shape.regions)
-        swf.xcod_writer.write_uint16(shape.id)
-        swf.xcod_writer.write_uint16(regions_count)
-        for region_index in range(regions_count):
-            region = shape.regions[region_index]
-
-            swf.xcod_writer.write_ubyte(region.texture_index)
-            swf.xcod_writer.write_ubyte(region.get_point_count())
-
-            for i in range(region.get_point_count()):
-                swf.xcod_writer.write_uint16(int(region.get_u(i)))
-                swf.xcod_writer.write_uint16(int(region.get_v(i)))
-
-    for shape_index in range(shapes_count):
-        shape = swf.shapes[shape_index]
-
+    for shape_index, shape in enumerate(swf.shapes):
         Console.progress_bar(
-            locale.cut_sprites_process % (shape_index + 1, shapes_count),
+            locale.cut_sprites_process % (shape_index + 1, shape_count),
             shape_index,
-            shapes_count,
+            shape_count,
         )
 
         rendered_shape = create_renderable_from_plain(swf, shape).render(Matrix2x3())
         rendered_shape.save(f"{output_folder}/shapes/{shape.id}.png")
 
-        regions_count = len(shape.regions)
-        for region_index in range(regions_count):
-            region = shape.regions[region_index]
-
-            rendered_region = region.get_image()
+        for region_index, command in enumerate(shape.commands):
+            rendered_region = command.get_image()
             rendered_region.save(f"{output_folder}/shape_{shape.id}_{region_index}.png")
 
     if config.should_render_movie_clips:

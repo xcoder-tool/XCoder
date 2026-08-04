@@ -10,7 +10,7 @@ from xcoder.localization import locale
 
 
 @logger.catch()
-def initialize(first_init=False):
+def initialize(first_init: bool) -> None:
     if first_init:
         clear()
 

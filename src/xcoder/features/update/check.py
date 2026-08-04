@@ -1,5 +1,6 @@
 import json
 import os
+from typing import Literal
 
 from loguru import logger
 
@@ -9,7 +10,7 @@ from xcoder.features.update.download import download_update
 from xcoder.localization import locale
 
 
-def get_run_output(command: str):
+def get_run_output(command: str) -> str:
     import tempfile
 
     temp_filename = tempfile.mktemp(".temp")
@@ -25,7 +26,7 @@ def get_run_output(command: str):
     return file_data
 
 
-def get_pip_info(outdated: bool = False) -> list:
+def get_pip_info(outdated: bool = False) -> list[list[str]]:
     output = get_run_output(
         f"pip --disable-pip-version-check list {'-o' if outdated else ''}"
     )
@@ -36,7 +37,7 @@ def get_pip_info(outdated: bool = False) -> list:
     return packages
 
 
-def get_tags(owner: str, repo: str):
+def get_tags(owner: str, repo: str) -> list[dict[Literal["name", "zipball_url"], str]]:
     api_url = "https://api.github.com"
 
     import urllib.request
@@ -52,7 +53,7 @@ def get_tags(owner: str, repo: str):
     return tags
 
 
-def check_update():
+def check_update() -> None:
     tags = get_tags(config.repo_owner, config.repo_name)
 
     if len(tags) > 0:

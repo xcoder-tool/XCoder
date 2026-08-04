@@ -161,14 +161,16 @@ def refill_menu():
         Menu.Item(
             name=locale.reinit,
             description=locale.reinit_description,
-            handler=lambda: (initialize(), refill_menu()),
+            handler=lambda: None if (initialize(False), refill_menu()) else None,
         )
     )
     other.add(
         Menu.Item(
             name=locale.change_language,
             description=locale.change_lang_description % config.language,
-            handler=lambda: (config.change_language(locale.change()), refill_menu()),
+            handler=lambda: None
+            if (config.change_language(locale.change()), refill_menu())
+            else None,
         )
     )
     other.add(
@@ -176,7 +178,7 @@ def refill_menu():
             name=locale.clear_directories,
             description=locale.clean_dirs_description,
             handler=lambda: (
-                clear_directories() if Console.question(locale.clear_qu) else -1
+                clear_directories() if Console.question(locale.clear_qu) else None
             ),
         )
     )
@@ -184,7 +186,11 @@ def refill_menu():
         Menu.Item(
             name=locale.toggle_update_auto_checking,
             description=locale.enabled if config.auto_update else locale.disabled,
-            handler=lambda: (config.toggle_auto_update(), refill_menu()),
+            handler=lambda: None
+            if (config.toggle_auto_update(), refill_menu())
+            else None,
         )
     )
-    other.add(Menu.Item(name=locale.exit, handler=lambda: (clear(), exit())))
+    other.add(
+        Menu.Item(name=locale.exit, handler=lambda: None if (clear(), exit()) else None)
+    )

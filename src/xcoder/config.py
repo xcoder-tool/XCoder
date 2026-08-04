@@ -1,22 +1,22 @@
 import json
 import os
 from pathlib import Path
-from typing import LiteralString
+from typing import ClassVar, LiteralString
 
 # ./src/xcoder/config.py
 _PROJECT_DIRECTORY = Path(__file__).parent.parent.parent
 
 
 class Config:
-    DEFAULT_LANGUAGE: LiteralString = "en-EU"
+    DEFAULT_LANGUAGE: ClassVar[LiteralString] = "en-EU"
 
-    REPO_OWNER: LiteralString = "xcoder-tool"
-    REPO_NAME: LiteralString = "xcoder"
+    REPO_OWNER: ClassVar[LiteralString] = "xcoder-tool"
+    REPO_NAME: ClassVar[LiteralString] = "xcoder"
 
-    config_path = _PROJECT_DIRECTORY / "config.json"
+    config_path: ClassVar[Path] = _PROJECT_DIRECTORY / "config.json"
 
-    def __init__(self):
-        self.config_items = (
+    def __init__(self) -> None:
+        self.config_items: tuple[LiteralString, ...] = (
             "initialized",
             "repo_owner",
             "repo_name",
@@ -31,7 +31,7 @@ class Config:
         self.initialized: bool = False
         self.repo_owner: str = Config.REPO_OWNER
         self.repo_name: str = Config.REPO_NAME
-        self.version = None
+        self.version: str | None = None
         self.language: str = Config.DEFAULT_LANGUAGE
         self.has_update: bool = False
         self.last_update: int = -1

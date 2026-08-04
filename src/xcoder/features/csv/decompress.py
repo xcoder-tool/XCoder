@@ -1,7 +1,7 @@
 import os
 
 from loguru import logger
-from sc_compression import decompress
+from sc_compression import Decompressor
 
 from xcoder.localization import locale
 
@@ -17,7 +17,7 @@ def decompress_csv():
                     file_data = f.read()
 
                 with open(f"{folder_export}/{file}", "wb") as f:
-                    f.write(decompress(file_data)[0])
+                    f.write(Decompressor.decompress(file_data))
             except Exception as exception:
                 logger.exception(
                     locale.error

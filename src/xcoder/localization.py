@@ -121,7 +121,7 @@ class Locale:
                 continue
             setattr(self, key, english_locale[key])
 
-    def change(self):
+    def change(self) -> str:
         language_files = os.listdir(_LOCALES_DIRECTORY)
 
         for file_index, language_file in enumerate(language_files):
@@ -130,19 +130,20 @@ class Locale:
 
             print(f"{file_index + 1} - {language_name}")
 
-        language_index = input("\n>>> ")
-        try:
-            language_index = int(language_index) - 1
-            if language_index >= 0:
-                if language_index < len(language_files):
-                    language = ".".join(language_files[language_index].split(".")[:-1])
-                    self.load(language)
+        while True:
+            language_index = input("\n>>> ")
+            try:
+                language_index = int(language_index) - 1
+                if language_index >= 0:
+                    if language_index < len(language_files):
+                        language = ".".join(
+                            language_files[language_index].split(".")[:-1]
+                        )
+                        self.load(language)
 
-                    return language
-        except ValueError:
-            pass
-
-        return self.change()
+                        return language
+            except ValueError:
+                continue
 
 
 locale = Locale()

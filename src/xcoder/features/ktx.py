@@ -12,7 +12,7 @@ OUT_PNG_PATH = Path("./TEX/Out-PNG")
 OUT_KTX_PATH = Path("./TEX/Out-KTX")
 
 
-def convert_png_textures_to_ktx():
+def convert_png_textures_to_ktx() -> None:
     assert KtxTool.is_available()
 
     input_folder = IN_PNG_PATH
@@ -30,7 +30,7 @@ def convert_png_textures_to_ktx():
         KtxTool.convert_png_to_ktx(png_filepath, output_folder=output_folder)
 
 
-def convert_ktx_textures_to_png():
+def convert_ktx_textures_to_png() -> None:
     assert KtxTool.is_available()
 
     input_folder = IN_KTX_PATH

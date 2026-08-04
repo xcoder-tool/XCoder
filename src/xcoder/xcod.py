@@ -4,12 +4,12 @@ from dataclasses import dataclass
 import os
 from pathlib import Path
 
+from bytestream import BinaryReader
 from loguru import logger
+from sc.math.point import Point
 from sc_compression import Signatures
 
-from xcoder.bytestream import Reader
-from xcoder.localization import locale
-from xcoder.math.point import Point
+from .localization import locale
 
 
 @dataclass
@@ -43,37 +43,51 @@ class ShapeInfo:
 class FileInfo:
     name: str
     signature: Signatures
-    signature_version: int | None
     sheets: list[SheetInfo]
     shapes: list[ShapeInfo]
 
 
-def parse_info(metadata_file_path: Path, has_detailed_info: bool) -> FileInfo:
+def parse_info(metadata_file_path: Path) -> FileInfo:
     logger.info(locale.collecting_inf % metadata_file_path.name)
     print()
 
     with open(metadata_file_path, "rb") as file:
-        reader = Reader(file.read(), "big")
+        reader = BinaryReader(file.read(), "little")
 
     ensure_magic_known(reader)
 
     file_info = FileInfo(
-        os.path.splitext(metadata_file_path.name)[0], Signatures.NONE, None, [], []
+        os.path.splitext(metadata_file_path.name)[0], Signatures.NONE, [], []
     )
     parse_base_info(file_info, reader)
 
-    if has_detailed_info:
-        parse_detailed_info(file_info, reader)
+    shape_count = reader.read_ushort()
+    for _shape_index in range(shape_count):
+        shape_id = reader.read_ushort()
+
+        regions: list[RegionInfo] = []
+
+        command_count = reader.read_ushort()
+        for _region_index in range(command_count):
+            texture_id, point_count = reader.read_uchar(), reader.read_uchar()
+
+            points = [
+                Point(reader.read_ushort(), reader.read_ushort())
+                for _ in range(point_count)
+            ]
+
+            regions.append(RegionInfo(texture_id, points))
+
+        file_info.shapes.append(ShapeInfo(shape_id, regions))
 
     return file_info
 
 
-def parse_base_info(file_info: FileInfo, reader: Reader) -> None:
+def parse_base_info(file_info: FileInfo, reader: BinaryReader) -> None:
     file_info.signature = Signatures.SC
-    file_info.signature_version = 1 if reader.read_string() == "LZMA" else 3
 
-    sheets_count = reader.read_uchar()
-    for _i in range(sheets_count):
+    sheet_count = reader.read_uchar()
+    for _i in range(sheet_count):
         file_type = reader.read_uchar()
         pixel_type = reader.read_uchar()
         width = reader.read_ushort()
@@ -82,28 +96,7 @@ def parse_base_info(file_info: FileInfo, reader: Reader) -> None:
         file_info.sheets.append(SheetInfo(file_type, pixel_type, (width, height)))
 
 
-def parse_detailed_info(file_info: FileInfo, reader: Reader) -> None:
-    shapes_count = reader.read_ushort()
-    for _shape_index in range(shapes_count):
-        shape_id = reader.read_ushort()
-
-        regions = []
-
-        regions_count = reader.read_ushort()
-        for _region_index in range(regions_count):
-            texture_id, points_count = reader.read_uchar(), reader.read_uchar()
-
-            points = [
-                Point(reader.read_ushort(), reader.read_ushort())
-                for _ in range(points_count)
-            ]
-
-            regions.append(RegionInfo(texture_id, points))
-
-        file_info.shapes.append(ShapeInfo(shape_id, regions))
-
-
-def ensure_magic_known(reader: Reader) -> None:
+def ensure_magic_known(reader: BinaryReader) -> None:
     magic = reader.read(4)
     if magic != b"XCOD":
         raise IOError("Unknown file MAGIC: " + magic.hex())

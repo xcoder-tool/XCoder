@@ -8,7 +8,7 @@ CSV_FILE_TYPES = ("Compressed", "Decompressed")
 TEXTURE_FILE_TYPES = ("KTX", "PNG")
 
 
-def create_directories():
+def create_directories() -> None:
     for io_type in IO_TYPES:
         for filetype in SC_FILE_TYPES:
             os.makedirs(f"SC/{io_type}-{filetype}", exist_ok=True)
@@ -20,7 +20,7 @@ def create_directories():
             os.makedirs(f"TEX/{io_type}-{filetype}", exist_ok=True)
 
 
-def clear_directories():
+def clear_directories() -> None:
     for io_type in IO_TYPES:
         for filetype in SC_FILE_TYPES:
             _recreate_directory(f"SC/{io_type}-{filetype}")
@@ -32,7 +32,7 @@ def clear_directories():
             _recreate_directory(f"TEX/{io_type}-{filetype}")
 
 
-def _recreate_directory(directory):
+def _recreate_directory(directory: str) -> None:
     if os.path.isdir(directory):
         shutil.rmtree(directory)
     os.makedirs(directory, exist_ok=True)

@@ -1,21 +1,23 @@
+from collections.abc import Sequence
 import os
 from pathlib import Path
 import shutil
 
+from bytestream import BinaryWriter
 from loguru import logger
-from sc_compression import Signatures
+from sc import Shape
+from sc.swf import SupercellSWF
+from sc.texture import SWFTexture
 
-from xcoder.bytestream import Writer
 from xcoder.features.cut_sprites import render_objects
 from xcoder.localization import locale
-from xcoder.swf import SupercellSWF
 
 IN_COMPRESSED_PATH = Path("./SC/In-Compressed")
 OUT_DECOMPRESSED = Path("./SC/Out-Decompressed")
 OUT_SPRITES_PATH = Path("./SC/Out-Sprites")
 
 
-def decode_textures_only():
+def decode_textures_only() -> None:
     input_folder = IN_COMPRESSED_PATH
     output_folder = OUT_DECOMPRESSED
 
@@ -27,7 +29,7 @@ def decode_textures_only():
 
         try:
             swf = SupercellSWF()
-            texture_loaded, signature = swf.load(f"{input_folder / file}")
+            texture_loaded = swf.load(f"{input_folder / file}")
             if not texture_loaded:
                 logger.error(locale.texture_not_found % file)
                 continue
@@ -39,7 +41,12 @@ def decode_textures_only():
             )
 
             _save_textures(swf, objects_output_folder, base_name)
-            _save_meta_file(swf, objects_output_folder, base_name, signature)
+            _save_meta_file(
+                swf.textures,
+                swf.shapes,
+                objects_output_folder,
+                base_name,
+            )
         except Exception as exception:
             logger.exception(
                 locale.error
@@ -53,7 +60,7 @@ def decode_textures_only():
         print()
 
 
-def decode_and_render_objects():
+def decode_and_render_objects() -> None:
     input_folder = IN_COMPRESSED_PATH
     output_folder = OUT_SPRITES_PATH
     files = os.listdir(input_folder)
@@ -64,7 +71,7 @@ def decode_and_render_objects():
 
         try:
             swf = SupercellSWF()
-            texture_loaded, signature = swf.load(input_folder / file)
+            texture_loaded = swf.load(input_folder / file)
             if not texture_loaded:
                 logger.error(locale.texture_not_found % file)
                 continue
@@ -77,7 +84,12 @@ def decode_and_render_objects():
 
             render_objects(swf, objects_output_folder)
             _save_textures(swf, objects_output_folder / "textures", base_name)
-            _save_meta_file(swf, objects_output_folder, base_name, signature)
+            _save_meta_file(
+                swf.textures,
+                swf.shapes,
+                objects_output_folder,
+                base_name,
+            )
         except Exception as exception:
             logger.exception(
                 locale.error
@@ -91,7 +103,7 @@ def decode_and_render_objects():
         print()
 
 
-def get_file_basename(swf: SupercellSWF):
+def get_file_basename(swf: SupercellSWF) -> str:
     assert swf.filename is not None
     return os.path.basename(swf.filename).rsplit(".", 1)[0]
 
@@ -112,16 +124,33 @@ def _save_textures(swf: SupercellSWF, textures_output: Path, base_name: str) -> 
 
 
 def _save_meta_file(
-    swf: SupercellSWF,
+    textures: Sequence[SWFTexture],
+    shapes: Sequence[Shape],
     objects_output_folder: Path,
     base_name: str,
-    signature: Signatures,
 ) -> None:
-    writer = Writer()
+    writer = BinaryWriter("little")
     writer.write(b"XCOD")
-    writer.write_string(signature.name)
-    writer.write_ubyte(len(swf.textures))
-    writer.write(swf.xcod_writer.getvalue())
+
+    writer.write_uchar(len(textures))
+    for texture in textures:
+        writer.write_uchar(27)  # FIXME: hardcoded value
+        writer.write_uchar(texture.pixel_type)
+        writer.write_ushort(texture.width)
+        writer.write_ushort(texture.height)
+
+    writer.write_ushort(len(shapes))
+    for shape in shapes:
+        command_count = len(shape.commands)
+        writer.write_ushort(shape.id)
+        writer.write_ushort(command_count)
+        for command in shape.commands:
+            writer.write_uchar(command.texture_index)
+            writer.write_uchar(command.get_point_count())
+
+            for i in range(command.get_point_count()):
+                writer.write_ushort(int(command.get_u(i)))
+                writer.write_ushort(int(command.get_v(i)))
 
     with open(objects_output_folder / f"{base_name}.xcod", "wb") as file:
-        file.write(writer.getvalue())
+        file.write(writer.buffer)

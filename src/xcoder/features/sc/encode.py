@@ -14,7 +14,7 @@ IN_DECOMPRESSED_PATH = Path("./SC/In-Decompressed")
 IN_SPRITES_PATH = Path("./SC/In-Sprites/")
 
 
-def encode_textures_only():
+def encode_textures_only() -> None:
     input_folder = IN_DECOMPRESSED_PATH
     output_folder = OUT_COMPRESSED_PATH
 
@@ -28,7 +28,7 @@ def encode_textures_only():
         if xcod_path is None:
             continue
 
-        file_info = parse_info(xcod_path, False)
+        file_info = parse_info(xcod_path)
         sheets = _load_sheets(textures_input_folder)
         compile_sc(output_folder, file_info, sheets)
 
@@ -47,7 +47,7 @@ def collect_objects_and_encode(overwrite: bool = False) -> None:
         if xcod_path is None:
             continue
 
-        file_info = parse_info(xcod_path, True)
+        file_info = parse_info(xcod_path)
         sheets = place_sprites(file_info, objects_input_folder, overwrite)
         compile_sc(output_folder, file_info, sheets)
 
@@ -65,7 +65,7 @@ def _ensure_metadata_exists(input_folder: Path, file: str) -> Path | None:
 
 
 def _load_sheets(input_folder: Path) -> list[Image.Image]:
-    files = []
+    files: list[str] = []
     for i in os.listdir(input_folder):
         if i.endswith(".png"):
             files.append(i)

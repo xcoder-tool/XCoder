@@ -1,29 +1,29 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from math import inf
+from typing import TYPE_CHECKING, override
 
 from PIL import Image
+from sc.math.rect import Rect
+from sc.matrices import ColorTransform, Matrix2x3, MatrixBank
+from sc.movie_clip import MovieClip, MovieClipFrame, MovieClipFrameElement
 
-from xcoder.math.rect import Rect
-from xcoder.matrices import ColorTransform, Matrix2x3, MatrixBank
-from xcoder.objects.movie_clip.movie_clip import MovieClip
-from xcoder.objects.movie_clip.movie_clip_frame import MovieClipFrame
-from xcoder.objects.renderable.display_object import DisplayObject
+from .display_object import DisplayObject
 
 if TYPE_CHECKING:
-    from xcoder.swf import SupercellSWF
+    from sc.swf import SupercellSWF
 
 
 class RenderableMovieClip(DisplayObject):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
 
-        self._id = -1
+        self._id: int = -1
         self._export_name: str | None = None
         self._fps: int = 30
         self._frame_count: int = 0
         self._frames: list[MovieClipFrame] = []
-        self._frame_elements: list[tuple[int, int, int]] = []
+        self._frame_elements: list[MovieClipFrameElement] = []
         self._blends: list[int] = []
         self._binds: list[int] = []
         self._matrix_bank: MatrixBank | None = None
@@ -45,14 +45,13 @@ class RenderableMovieClip(DisplayObject):
         clip._frame_count = movie_clip.frame_count
         clip._frames = movie_clip.frames
         clip._frame_elements = movie_clip.frame_elements
-        clip._blends = movie_clip.blends
-        clip._binds = movie_clip.binds
         clip._children = children
 
         clip.set_frame(0)
 
         return clip
 
+    @override
     def render(self, matrix: Matrix2x3) -> Image.Image:
         matrix_multiplied = Matrix2x3(self._matrix)
         matrix_multiplied.multiply(matrix)
@@ -72,11 +71,12 @@ class RenderableMovieClip(DisplayObject):
 
         return image
 
+    @override
     def calculate_bounds(self, matrix: Matrix2x3) -> Rect:
         matrix_multiplied = Matrix2x3(self._matrix)
         matrix_multiplied.multiply(matrix)
 
-        rect = Rect()
+        rect = Rect(left=+inf, top=+inf, right=-inf, bottom=-inf)
 
         for child in self._frame_children:
             rect.merge_bounds(child.calculate_bounds(matrix_multiplied))
@@ -90,26 +90,24 @@ class RenderableMovieClip(DisplayObject):
 
         return rect
 
-    def set_frame(self, frame_index: int):
+    def set_frame(self, frame_index: int) -> None:
         assert self._matrix_bank is not None
 
         self._frame_children = []
 
         frame = self._frames[frame_index]
-        for child_index, matrix_index, color_transform_index in frame.get_elements():
+        for element in frame.get_elements():
             matrix = Matrix2x3()
-            if matrix_index != 0xFFFF:
-                matrix = self._matrix_bank.get_matrix(matrix_index)
+            if element.matrix_index != 0xFFFF:
+                matrix = self._matrix_bank.get_matrix(element.matrix_index)
 
             color_transform = ColorTransform()
-            if color_transform_index != 0xFFFF:
+            if element.color_index != 0xFFFF:
                 color_transform = self._matrix_bank.get_color_transform(
-                    color_transform_index
+                    element.color_index
                 )
 
-            child = self._children[child_index]
-            if child is None:
-                continue
+            child = self._children[element.child_index]
 
             child.set_matrix(matrix)
             child.set_color_transform(color_transform)

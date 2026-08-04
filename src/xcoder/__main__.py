@@ -9,7 +9,7 @@ from xcoder.localization import locale
 from xcoder.main_menu import check_auto_update, check_files_updated, menu, refill_menu
 
 
-def main():
+def main() -> int:
     if not config.initialized:
         config.change_language(locale.change())
 
@@ -41,8 +41,9 @@ def main():
         finally:
             clear()
 
-    logger.info("Exit.")
+    logger.info("Exited.")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    exit(main())

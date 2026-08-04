@@ -1,20 +1,25 @@
 from __future__ import annotations
 
-from PIL import Image
+from math import inf
+from typing import override
 
-from xcoder.math.rect import Rect
-from xcoder.matrices import Matrix2x3
-from xcoder.objects import Shape
-from xcoder.objects.renderable.display_object import DisplayObject
+from PIL import Image
+from sc.math.rect import Rect
+from sc.matrices import Matrix2x3
+from sc.shape import Shape
+
+from .display_object import DisplayObject
+from .renderable_draw_command import DrawCommand
 
 
 class RenderableShape(DisplayObject):
-    def __init__(self, shape: Shape):
+    def __init__(self, shape: Shape) -> None:
         super().__init__()
 
-        self._id = shape.id
-        self._regions = shape.regions
+        self._id: int = shape.id
+        self._commands: list[DrawCommand] = list(map(DrawCommand, shape.commands))
 
+    @override
     def render(self, matrix: Matrix2x3) -> Image.Image:
         matrix_multiplied = Matrix2x3(self._matrix)
         matrix_multiplied.multiply(matrix)
@@ -23,9 +28,9 @@ class RenderableShape(DisplayObject):
 
         image = Image.new("RGBA", (int(bounds.width), int(bounds.height)))
 
-        for region in self._regions:
-            rendered_region = region.render(matrix_multiplied)
-            region_bounds = region.calculate_bounds(matrix_multiplied)
+        for command in self._commands:
+            rendered_region = command.render(matrix_multiplied)
+            region_bounds = command.calculate_bounds(matrix_multiplied)
 
             x = int(region_bounds.left - bounds.left)
             y = int(region_bounds.top - bounds.top)
@@ -34,13 +39,14 @@ class RenderableShape(DisplayObject):
 
         return image
 
+    @override
     def calculate_bounds(self, matrix: Matrix2x3) -> Rect:
         matrix_multiplied = Matrix2x3(self._matrix)
         matrix_multiplied.multiply(matrix)
 
-        rect = Rect()
+        rect = Rect(left=+inf, top=+inf, right=-inf, bottom=-inf)
 
-        for region in self._regions:
+        for region in self._commands:
             rect.merge_bounds(region.calculate_bounds(matrix_multiplied))
 
         rect = Rect(

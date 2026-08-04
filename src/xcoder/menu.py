@@ -1,6 +1,6 @@
 import shutil
 import textwrap
-import typing
+from typing import Callable
 
 import colorama
 
@@ -10,7 +10,7 @@ from xcoder.localization import locale
 
 def print_feature(
     feature_id: int, name: str, description: str | None = None, console_width: int = -1
-):
+) -> None:
     text = f" {feature_id} {name}"
     if description:
         text += " " * (console_width // 2 - len(text)) + ": " + description
@@ -18,7 +18,7 @@ def print_feature(
     print(textwrap.fill(text, console_width))
 
 
-def print_category(text: str, background_width: int = 10):
+def print_category(text: str, background_width: int = 10) -> None:
     print(
         colorama.Back.GREEN
         + colorama.Fore.BLACK
@@ -28,42 +28,46 @@ def print_category(text: str, background_width: int = 10):
     )
 
 
+type MenuItemHandler = Callable[[], None]
+
+
 class Menu:
     class Item:
         def __init__(
             self,
             *,
             name: str,
-            handler: typing.Callable,
+            handler: MenuItemHandler,
             description: str | None = None,
-        ):
+        ) -> None:
             self.name: str = name
             self.description: str | None = description
-            self.handler: typing.Callable = handler
+            self.handler: MenuItemHandler = handler
 
     class Category:
-        def __init__(self, _id: int, name: str):
-            self.id = _id
-            self.name = name
-            self.items = []
+        def __init__(self, _id: int, name: str) -> None:
+            self.id: int = _id
+            self.name: str = name
+            self.items: list[Menu.Item] = []
 
         def item(self, name: str, description: str | None = None):
-            def wrapper(handler: typing.Callable):
+            def wrapper(handler: MenuItemHandler) -> None:
                 self.add(Menu.Item(name=name, handler=handler, description=description))
 
             return wrapper
 
-        def add(self, item):
+        def add(self, item: "Menu.Item") -> "Menu.Item":
             self.items.append(item)
+            return item
 
-    def __init__(self):
-        self.categories = []
+    def __init__(self) -> None:
+        self.categories: list[Menu.Category] = []
 
-    def add_category(self, category):
+    def add_category(self, category: Category) -> Category:
         self.categories.append(category)
         return category
 
-    def choice(self):
+    def choice(self) -> MenuItemHandler | None:
         console_width = shutil.get_terminal_size().columns
         print(
             (

@@ -1,7 +1,7 @@
 import os
 
 from loguru import logger
-from sc_compression import compress
+from sc_compression import Compressor
 
 from xcoder.localization import locale
 
@@ -19,7 +19,7 @@ def compress_csv():
                     file_data = f.read()
 
                 with open(f"{folder_export}/{file}", "wb") as f:
-                    f.write(compress(file_data, Signatures.LZMA))
+                    f.write(Compressor.compress(file_data, Signatures.LZMA, 1))
             except Exception as exception:
                 logger.exception(
                     locale.error
